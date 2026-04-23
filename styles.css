@@ -1168,7 +1168,8 @@ button {
 }
 
 .contact-cards {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 260px));
+  justify-content: center;
   gap: 14px;
 }
 
@@ -1203,6 +1204,68 @@ button {
 
 .contact-card span {
   width: 100%;
+}
+
+.branch-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  text-align: left;
+}
+
+.branch-card {
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.92);
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: var(--shadow-md);
+}
+
+.branch-card-copy {
+  padding: 24px;
+}
+
+.branch-card-copy span {
+  display: inline-block;
+  margin-bottom: 8px;
+  color: var(--primary);
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.branch-card-copy h3 {
+  margin: 0 0 10px;
+  font-size: 1.32rem;
+}
+
+.branch-card-copy p {
+  margin: 0 0 16px;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.branch-card-copy a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 0 14px;
+  border-radius: 999px;
+  color: var(--primary-deep);
+  font-size: 0.9rem;
+  font-weight: 800;
+  text-decoration: none;
+  background: rgba(31, 75, 122, 0.1);
+}
+
+.branch-card iframe {
+  display: block;
+  width: 100%;
+  height: 320px;
+  border: 0;
+  background: var(--surface-muted);
 }
 
 .site-footer {
@@ -1250,7 +1313,8 @@ button {
   .about-cards,
   .resume-columns,
   .coach-profile-body,
-  .contact-cards {
+  .contact-cards,
+  .branch-grid {
     grid-template-columns: 1fr 1fr;
   }
 
@@ -1360,7 +1424,8 @@ button {
   .about-cards,
   .resume-columns,
   .coach-profile-body,
-  .contact-cards {
+  .contact-cards,
+  .branch-grid {
     grid-template-columns: 1fr;
   }
 
