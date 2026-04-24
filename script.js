@@ -8,8 +8,6 @@ const intro = document.querySelector(".intro-overlay");
 const popup = document.querySelector("[data-popup]");
 const popupCloseButtons = document.querySelectorAll("[data-popup-close], [data-popup-anchor]");
 const imageOpenButtons = document.querySelectorAll("[data-image-open]");
-const kakaoCopyButtons = document.querySelectorAll("[data-copy-kakao]");
-const copyStatus = document.querySelector("[data-copy-status]");
 
 let imageModal = document.querySelector("[data-image-modal]");
 let imageModalImg = document.querySelector("[data-image-modal-img]");
@@ -132,17 +130,6 @@ imageOpenButtons.forEach((button) => {
     imageModalImg.alt = label;
     imageModal.classList.add("is-open");
     imageModal.setAttribute("aria-hidden", "false");
-  });
-});
-
-kakaoCopyButtons.forEach((button) => {
-  button.addEventListener("click", async () => {
-    try {
-      await navigator.clipboard.writeText("plie");
-      if (copyStatus) copyStatus.textContent = "카카오톡 ID plie가 복사되었습니다.";
-    } catch {
-      if (copyStatus) copyStatus.textContent = "카카오톡 친구 추가에서 ID plie를 검색해주세요.";
-    }
   });
 });
 
