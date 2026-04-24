@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# Current GitHub Pages sitemap
+Sitemap: https://plie-rg.github.io/Plie/sitemap.xml

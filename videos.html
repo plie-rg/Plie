@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PLIE 소식 | 수업 스냅·공지·성장 리포트</title>
+    <meta
+      name="description"
+      content="PLIE 리듬체조 아카데미 소식 페이지입니다. 수업 스냅, 공지, 대회 기록, 성장 리포트 샘플을 한곳에서 관리할 수 있습니다."
+    />
+    <meta name="robots" content="index, follow" />
+    <meta property="og:title" content="PLIE 소식 | 수업 스냅·공지·성장 리포트" />
+    <meta
+      property="og:description"
+      content="PLIE의 수업 분위기와 공지, 성장 리포트 예시를 모아보는 커뮤니티형 소식 페이지입니다."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="ko_KR" />
+    <meta property="og:image" content="./assets/logo.png" />
+    <link rel="icon" href="./assets/logo.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="site-header"><div class="shell header-inner"><a class="brand" href="./index.html"><img src="./assets/logo.png" alt="PLIE 로고" /><span>PLIE</span></a><button class="nav-toggle" type="button" aria-expanded="false" aria-label="메뉴 열기"><span></span><span></span></button><nav class="site-nav"><a href="./index.html">홈</a><a href="./about.html">소개</a><a href="./programs.html">수업</a><a href="./ltad.html">교육 철학</a><a href="./instructors.html">강사진</a><a href="./videos.html" aria-current="page">소식</a><a class="nav-cta" href="./contact.html">상담</a></nav></div></header>
+    <main>
+      <section class="page-hero compact-hero news-hero">
+        <div class="shell page-hero__copy" data-reveal>
+          <p class="eyebrow">PLIE NEWS</p>
+          <h1>수업 스냅과 플리에 소식</h1>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="shell news-grid">
+          <article class="news-card featured" data-reveal>
+            <div class="news-visual logo-visual"><span>PLIE</span></div>
+            <div class="news-copy">
+              <span>Notice</span>
+              <h2>플리에 수업 안내</h2>
+              <p>상담 후 아이의 성장 단계, 움직임 경험, 수업 목표에 맞춰 반을 안내합니다.</p>
+            </div>
+          </article>
+          <article class="news-card" data-reveal>
+            <button class="news-visual report-visual" type="button" data-image-open="./assets/reports/sample-report-1.png" aria-label="성장 리포트 샘플 크게 보기"><img src="./assets/reports/sample-report-1.png" alt="성장 리포트 샘플" /></button>
+            <div class="news-copy">
+              <span>Report</span>
+              <h2>성장 리포트 샘플</h2>
+              <p>수업 이후 변화와 보완점을 보호자도 이해하기 쉽게 정리합니다.</p>
+            </div>
+          </article>
+          <article class="news-card" data-reveal>
+            <button class="news-visual report-visual" type="button" data-image-open="./assets/reports/sample-report-2.png" aria-label="수업 기록 샘플 크게 보기"><img src="./assets/reports/sample-report-2.png" alt="성장 리포트 샘플" /></button>
+            <div class="news-copy">
+              <span>Class</span>
+              <h2>수업 기록</h2>
+              <p>사진을 추가하면 수업 분위기, 작품 준비, 대회 준비 기록을 카드로 쌓을 수 있습니다.</p>
+            </div>
+          </article>
+        </div>
+      </section>
+    </main>
+    <div class="image-modal" data-image-modal aria-hidden="true">
+      <div class="image-modal-backdrop" data-image-close></div>
+      <div class="image-modal-dialog" role="dialog" aria-modal="true" aria-label="이미지 크게 보기">
+        <button type="button" data-image-close aria-label="이미지 닫기">닫기</button>
+        <img src="" alt="" data-image-modal-img />
+      </div>
+    </div>
+    <footer class="site-footer"><div class="shell footer-inner"><p>PLIE Rhythmic Gymnastics Academy</p><p>&copy; <span id="year"></span> All rights reserved.</p></div></footer>
+    <script src="./script.js"></script>
+  </body>
+</html>
