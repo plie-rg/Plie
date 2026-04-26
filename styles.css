@@ -335,7 +335,7 @@ h3 {
 
 .about-hero::after,
 .ltad-hero::after {
-  content: "PLIE";
+  content: "PLIÉ";
   position: absolute;
   right: max(24px, calc((100vw - 1160px) / 2));
   bottom: -0.18em;
