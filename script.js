@@ -58,6 +58,10 @@ if (year) {
   year.textContent = String(new Date().getFullYear());
 }
 
+const revealAllTargets = () => {
+  revealTargets.forEach((target) => target.classList.add("is-visible"));
+};
+
 const syncHeaderState = () => {
   header?.classList.toggle("scrolled", window.scrollY > 12);
 };
@@ -65,7 +69,13 @@ const syncHeaderState = () => {
 syncHeaderState();
 window.addEventListener("scroll", syncHeaderState, { passive: true });
 
-if ("IntersectionObserver" in window) {
+const shouldSkipRevealAnimation =
+  window.matchMedia("(max-width: 760px)").matches ||
+  window.matchMedia("(pointer: coarse)").matches;
+
+if (shouldSkipRevealAnimation) {
+  revealAllTargets();
+} else if ("IntersectionObserver" in window) {
   const observer = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
@@ -82,7 +92,7 @@ if ("IntersectionObserver" in window) {
 
   revealTargets.forEach((target) => observer.observe(target));
 } else {
-  revealTargets.forEach((target) => target.classList.add("is-visible"));
+  revealAllTargets();
 }
 
 const closeImage = () => {
