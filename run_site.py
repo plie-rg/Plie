@@ -37,7 +37,7 @@ def build_handler(directory: Path) -> type[http.server.SimpleHTTPRequestHandler]
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Run the PLIE static site locally for desktop and phone testing.",
+        description="Run the PLIÉ static site locally for desktop and phone testing.",
     )
     parser.add_argument("--host", default="0.0.0.0", help="Host to bind to. Default: 0.0.0.0")
     parser.add_argument("--port", type=int, default=8000, help="Port to bind to. Default: 8000")
@@ -60,7 +60,7 @@ def main() -> int:
         lan_ip = detect_local_ip()
         lan_url = f"http://{lan_ip}:{args.port}/index.html"
 
-        print("PLIE local server is running.")
+        print("PLIÉ local server is running.")
         print(f"Project folder : {site_root}")
         print(f"Desktop URL    : {local_url}")
         print(f"Phone URL      : {lan_url}")
