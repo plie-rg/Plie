@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-
-=======
 # PLIÉ
 
 Static website project for the PLIÉ academy.
@@ -24,4 +21,3 @@ Options:
 python run_site.py --port 9000
 python run_site.py --no-browser
 ```
->>>>>>> 6f815fc (이름바꾸기 plie)
