@@ -2,10 +2,11 @@
 
 관리 계정: plie0312@gmail.com
 관리 주소: https://script.google.com/macros/s/AKfycbzDBC65fprV2WZGbjnK0tNhGC5T449x3OlQZN-lTFz4KrwbFsY83ynOfmjCB3oMxHYl/exec
+접속 방법: 이 주소를 관리자의 브라우저 즐겨찾기에 저장합니다. 공개 홈페이지에는 관리자 링크를 표시하지 않습니다.
 
 현재 상태
 - 사용자가 새 프로젝트 생성, setupPlieCms 권한 승인, 웹 앱 배포를 진행하고 위 주소를 제공했습니다.
-- 비로그인 접속에서 Google 로그인 화면을 확인했습니다. 사용자가 v3 로딩 수정 후 관리자 화면 진입과 GitHub 키 저장을 확인했습니다. 실제 업로드와 홈페이지 게시 검증은 남아 있습니다.
+- 비로그인 접속에서 Google 로그인 화면을 확인했습니다. 사용자가 관리자 진입과 홈페이지 반영 완료를 확인했고, Google 관리자에서 생성한 Git 커밋도 확인했습니다. 실제 글·파일 업로드 검증은 남아 있습니다.
 - 대여관리 프로젝트와 별개입니다. 대여 Code.gs에 붙여넣지 않습니다.
 
 설치 및 업데이트
