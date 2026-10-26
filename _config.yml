@@ -3,6 +3,7 @@
 exclude:
   - plie-rental
   - cms-app
+  - cms-google
   - run_site.py
   - test_static_preview.py
   - README.md

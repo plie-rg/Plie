@@ -10,6 +10,7 @@ __pycache__/
 /cms-app/data/
 /cms-app/vendor/
 /cms-app/qa/
+/cms-google/qa/
 /플리에 대여시스템.exe
 
 # Local-only credentials, if added later.

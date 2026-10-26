@@ -1,0 +1,34 @@
+플리에 Google 게시물 관리자
+
+관리 계정: plie0312@gmail.com
+관리 주소: https://script.google.com/macros/s/AKfycbzDBC65fprV2WZGbjnK0tNhGC5T449x3OlQZN-lTFz4KrwbFsY83ynOfmjCB3oMxHYl/exec
+
+현재 상태
+- 사용자가 새 프로젝트 생성, setupPlieCms 권한 승인, 웹 앱 배포를 진행하고 위 주소를 제공했습니다.
+- 비로그인 접속에서 Google 로그인 화면을 확인했습니다. 사용자가 v3 로딩 수정 후 관리자 화면 진입과 GitHub 키 저장을 확인했습니다. 실제 업로드와 홈페이지 게시 검증은 남아 있습니다.
+- 대여관리 프로젝트와 별개입니다. 대여 Code.gs에 붙여넣지 않습니다.
+
+설치 및 업데이트
+1. build.py를 실행해 Install.gs를 생성합니다.
+2. 새 Apps Script 프로젝트의 Code.gs를 Install.gs 전체 내용으로 교체하고 저장합니다.
+   Admin.html과 Article.html은 Install.gs에 포함되어 별도로 만들 필요가 없습니다.
+3. setupPlieCms를 관리 계정으로 실행합니다. 기존 저장소는 유지합니다.
+4. 웹 앱을 '웹 앱에 액세스하는 사용자' 실행, '나만' 접근으로 배포합니다.
+5. 수정 후에는 배포 관리에서 해당 배포를 새 버전으로 업데이트합니다.
+
+GitHub 자동 게시 연결
+1. Plie 저장소에 쓰기 권한이 있는 GitHub 계정으로 로그인합니다.
+2. https://github.com/settings/personal-access-tokens/new 에서 fine-grained token을 만듭니다.
+3. Resource owner는 plie-rg, Repository access는 Only select repositories → Plie.
+4. Repository permissions의 Contents만 Read and write로 설정합니다. Metadata 읽기는 자동 포함됩니다.
+5. 만료일을 설정하고 만료 전에 갱신합니다. 조직 승인이 필요하면 승인 후 사용합니다.
+6. 생성된 값은 채팅이나 소스 파일에 보내지 않습니다.
+7. Apps Script의 프로젝트 설정 → 스크립트 속성에 CMS_GITHUB_TOKEN 이름으로 직접 저장합니다.
+8. 관리자 화면을 새로고침하고 실제로 공개할 글을 작성한 뒤 홈페이지 게시를 실행합니다.
+9. 홈페이지 반영 확인 문구와 실제 소식 페이지에서 게시물이 보이는지 확인합니다.
+
+초안·원본은 플리에 계정의 비공개 Drive에 저장됩니다.
+게시한 글·사진·영상은 공개 GitHub 저장소와 홈페이지에 반영됩니다.
+게시 취소나 삭제는 현재 홈페이지에서 제거하며 Git 기록까지 영구 삭제하지 않습니다.
+파일 영상은 브라우저에서 재생 가능한 MP4, 파일당 최대 25MB입니다. 큰 영상은 YouTube 링크를 사용합니다.
+Google 게시 전환 확인 후 기존 PC 관리자 자동 게시 설정을 해제합니다. 서로 다른 CMS의 공개 데이터가 있으면 덮어쓰기를 차단합니다.

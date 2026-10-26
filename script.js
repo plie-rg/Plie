@@ -11,6 +11,8 @@ const imageOpenButtons = document.querySelectorAll("[data-image-open]");
 
 let imageModal = document.querySelector("[data-image-modal]");
 let imageModalImg = document.querySelector("[data-image-modal-img]");
+let lastImageTrigger = null;
+let previousBodyOverflow = "";
 let imageCloseButtons = document.querySelectorAll("[data-image-close]");
 
 if (intro) {
@@ -96,10 +98,12 @@ if (shouldSkipRevealAnimation) {
 }
 
 const closeImage = () => {
-  if (!imageModal || !imageModalImg) return;
+  if (!imageModal || !imageModalImg || !imageModal.classList.contains("is-open")) return;
   imageModalImg.removeAttribute("src");
   imageModal.classList.remove("is-open");
+  lastImageTrigger?.focus();
   imageModal.setAttribute("aria-hidden", "true");
+  document.body.style.overflow = previousBodyOverflow;
 };
 
 const wireImageCloseButtons = () => {
@@ -138,11 +142,19 @@ imageOpenButtons.forEach((button) => {
     if (!source) return;
     imageModalImg.src = source;
     imageModalImg.alt = label;
+    lastImageTrigger = button;
+    previousBodyOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
     imageModal.classList.add("is-open");
     imageModal.setAttribute("aria-hidden", "false");
+    imageModal.querySelector("button[data-image-close]")?.focus();
   });
 });
 
 window.addEventListener("keydown", (event) => {
   if (event.key === "Escape") closeImage();
+  if (event.key === "Tab" && imageModal?.classList.contains("is-open")) {
+    event.preventDefault();
+    imageModal.querySelector("button[data-image-close]")?.focus();
+  }
 });
