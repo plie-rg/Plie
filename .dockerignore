@@ -1,0 +1,14 @@
+.git
+.env*
+.codex
+.agents
+**/node_modules
+**/__pycache__
+**/*.log
+**/.setup-key
+plie-rental
+cms-app/data
+cms-app/qa
+cms-app/vendor
+**/*.exe
+**/*.zip

@@ -1,0 +1,17 @@
+# GitHub Pages publishes the customer site; local tools stay out of its output.
+# This does not make source in a public Git repository private.
+exclude:
+  - plie-rental
+  - cms-app
+  - run_site.py
+  - test_static_preview.py
+  - README.md
+  - "플리에 대여시스템.exe"
+  - "플리에 게시물 관리 실행.cmd"
+  - node_modules
+  - vendor
+  - Gemfile
+  - Gemfile.lock
+  - gemfiles
+  - .sass-cache
+  - .jekyll-cache

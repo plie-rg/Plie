@@ -1,0 +1,24 @@
+# Local preview records and generated artifacts never belong in Git.
+.venv/
+__pycache__/
+*.py[cod]
+*.log
+/plie-rental/data/
+/plie-rental/qa/
+/plie-rental/dist/
+/plie-rental/website-source/
+/cms-app/data/
+/cms-app/vendor/
+/cms-app/qa/
+/플리에 대여시스템.exe
+
+# Local-only credentials, if added later.
+.env
+.env.*
+!.env.example
+*.local.json
+*.local.js
+.dev.vars
+.dev.vars.*
+.wrangler/
+node_modules/

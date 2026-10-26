@@ -30,17 +30,28 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="./content.css" />
   </head>
   <body>
     <header class="site-header"><div class="shell header-inner"><a class="brand" href="./index.html"><img src="./assets/logo.png" alt="PLIÉ 로고" /><span>PLIÉ</span></a><button class="nav-toggle" type="button" aria-expanded="false" aria-label="메뉴 열기"><span></span><span></span></button><nav class="site-nav"><a href="./index.html">홈</a><a href="./about.html">소개</a><a href="./programs.html">수업</a><a href="./ltad.html">교육 철학</a><a href="./instructors.html">강사진</a><a href="./videos.html" aria-current="page">소식</a><a class="nav-cta" href="./contact.html">상담</a></nav></div></header>
     <main>
       <section class="page-hero compact-hero news-hero">
         <div class="shell page-hero__copy" data-reveal>
-          <p class="eyebrow">PLIÉ ARCHIVE</p>
-          <h1>행사별로 기록을 모아보는 소식 페이지</h1>
+          <p class="eyebrow">PLIÉ JOURNAL</p>
+          <h1>플리에의 오늘을 전합니다.</h1>
+          <p>수업의 순간부터 대회와 발표회까지, 함께 쌓아가는 이야기.</p>
         </div>
       </section>
 
+      <section class="section" data-cms-section="news" hidden>
+        <div class="shell">
+          <div class="journal-heading"><div><p class="eyebrow">LATEST STORIES</p><h2>새로운 소식</h2></div></div>
+          <div class="journal-filters" data-cms-filter>
+            <button class="active" data-category="all" aria-pressed="true">전체</button><button data-category="notice" aria-pressed="false">공지사항</button><button data-category="class" aria-pressed="false">수업 이야기</button><button data-category="event" aria-pressed="false">행사 · 발표회</button><button data-category="competition" aria-pressed="false">대회 소식</button><input type="search" data-cms-search placeholder="궁금한 소식을 찾아보세요" aria-label="게시물 검색">
+          </div>
+          <div class="journal-grid" data-cms-grid></div>
+        </div>
+      </section>
       <section class="section">
         <div class="shell news-grid">
           <article class="news-card featured" data-reveal>
@@ -74,5 +85,7 @@
     </main>
     <footer class="site-footer"><div class="shell footer-inner"><p>PLIÉ Rhythmic Gymnastics Academy</p><p>&copy; <span id="year"></span> All rights reserved.</p></div></footer>
     <script src="./script.js"></script>
+    <script src="./content-config.js"></script>
+    <script src="./content.js"></script>
   </body>
 </html>
