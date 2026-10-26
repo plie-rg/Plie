@@ -42,6 +42,10 @@ def is_public_file(parts: tuple[str, ...]) -> bool:
         return False
     if len(parts) == 1:
         return parts[0] in PUBLIC_ROOT_FILES
+    if parts[0] == "content":
+        return len(parts) == 2 and parts[1] in ("posts.json", "release.json")
+    if parts[0] == "news":
+        return len(parts) == 2 and len(parts[1]) == 37 and parts[1].endswith(".html") and all(c in "0123456789abcdef" for c in parts[1][:-5])
     if parts[0] == "rental-app":
         return len(parts) == 2 and parts[1] in PUBLIC_RENTAL_FILES
     if parts[0] == "admin":

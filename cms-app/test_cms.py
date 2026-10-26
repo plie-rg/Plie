@@ -11,6 +11,29 @@ import unittest
 import app
 
 class CMSChecks(unittest.TestCase):
+    def test_publication_routes_require_session_and_csrf_and_drafts_do_not_push(self):
+        from unittest.mock import Mock, patch
+        publisher=Mock()
+        publisher.status.return_value={'enabled':True,'phase':'ready','siteUrl':'https://www.plierg.com'}
+        publisher.request.return_value={'enabled':True,'phase':'queued'}
+        with patch.object(app,'PUBLISHER',publisher):
+            self.assertEqual(self.request('/api/site-status',anonymous=True)[0],401)
+            self.login()
+            self.assertEqual(self.request('/api/site-status')[0],200)
+            self.assertEqual(self.request('/api/site-sync',{},headers={'X-CSRF-Token':'wrong'})[0],403)
+            self.assertEqual(self.request('/api/site-sync',{})[0],200)
+            publisher.request.reset_mock()
+            post={'title':'Draft stays local','blocks':[{'type':'text','text':'A local draft'}]}
+            status,_,saved=self.request('/api/save',{'post':post})
+            self.assertEqual(status,200)
+            publisher.request.assert_not_called()
+            status,_,published=self.request('/api/publish',{'id':saved['id'],'revision':saved['revision'],'post':post})
+            self.assertEqual(status,200)
+            publisher.request.assert_called_once()
+            status,_,_=self.request('/api/unpublish',{'id':published['id'],'revision':published['revision']})
+            self.assertEqual(status,200)
+            self.assertEqual(publisher.request.call_count,2)
+
     def setUp(self):
         self.temp=tempfile.TemporaryDirectory(prefix='plie-cms-qa-')
         app.initialize(Path(self.temp.name)/'data')

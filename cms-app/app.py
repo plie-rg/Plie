@@ -26,6 +26,7 @@ CATEGORIES = {'notice': '공지사항', 'class': '수업 이야기', 'event': '�
 NOW = lambda: datetime.now(timezone.utc).isoformat()
 LOCK = threading.Lock()
 ATTEMPTS = {}
+PUBLISHER = None
 
 class Problem(Exception):
     def __init__(self, message, status=400): self.message, self.status = message, status
@@ -202,7 +203,30 @@ def save_upload(incoming, kind):
         POOL.submit(process_video, media_id, incoming)
     with db() as con: return media_json(con.execute('SELECT * FROM media WHERE id=?',(media_id,)).fetchone())
 
-def article_html(post):
+def public_snapshot():
+    # One read transaction keeps the export consistent while another window edits.
+    with db() as con:
+        con.execute('BEGIN')
+        result = []
+        for row in con.execute('SELECT id,published FROM posts WHERE published IS NOT NULL ORDER BY updated DESC'):
+            post = json.loads(row['published'])
+            assets = con.execute("SELECT m.* FROM media m JOIN media_links l ON l.media_id=m.id WHERE l.post_id=? AND l.audience='public'", (row['id'],)).fetchall()
+            post.update(id=row['id'], url='/news/'+row['id']+'.html', media={a['id']:media_json(a) for a in assets})
+            result.append(post)
+        return result
+
+
+def publishing_status():
+    return PUBLISHER.status() if PUBLISHER else {'enabled':False,'phase':'disabled','siteUrl':''}
+
+
+def queue_publication():
+    if PUBLISHER:
+        PUBLISHER.request()
+
+
+def article_html(post, origin=None):
+    origin = origin or ORIGIN
     title, description = escape(post['title']), escape(post['excerpt'])
     blocks=[]
     for block in post['blocks']:
@@ -216,10 +240,10 @@ def article_html(post):
             blocks.append('<figure>'+body+'<figcaption>'+escape(block['caption'])+'</figcaption></figure>')
         elif kind == 'youtube':
             blocks.append(f'<figure><iframe class="youtube" src="https://www.youtube-nocookie.com/embed/{block["videoId"]}" title="{escape(block["caption"] or "플리에 영상",quote=True)}" loading="lazy" allow="fullscreen; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe><figcaption>{escape(block["caption"])}</figcaption></figure>')
-    canonical=ORIGIN+post['url']
+    canonical=origin+post['url']
     cover=post['media'].get(post['coverId'])
-    cover_url=ORIGIN+(cover['poster'] or cover['url']) if cover else ORIGIN+'/assets/logo.png'
-    schema=json.dumps({'@context':'https://schema.org','@type':'Article','headline':post['title'],'description':post['excerpt'],'datePublished':post['publishedAt'],'dateModified':post['updatedAt'],'image':cover_url,'author':{'@type':'Organization','name':'플리에 리듬체조 아카데미'},'mainEntityOfPage':canonical},ensure_ascii=True).replace('<','\\u003c')
+    cover_url=origin+(cover['poster'] or cover['url']) if cover else origin+'/assets/logo.png'
+    schema=json.dumps({'@context':'https://schema.org','@type':'Article','headline':post['title'],'description':post['excerpt'],'datePublished':post['publishedAt'],'dateModified':post['updatedAt'],'image':cover_url,'author':{'@type':'Organization','name':'플리에 리듬체조 아카데미'},'mainEntityOfPage':canonical},ensure_ascii=True).replace('<',r'<')
     template=(ROOT/'article.html').read_text(encoding='utf-8')
     values={'TITLE':title,'DESCRIPTION':description,'CANONICAL':escape(canonical,quote=True),'COVER':escape(cover_url,quote=True),'CATEGORY':CATEGORIES[post['category']],'DATE':post['publishedAt'][:10].replace('-','.'),'BODY':''.join(blocks),'JSONLD':schema}
     for key,value in values.items(): template=template.replace('{{'+key+'}}',value)
@@ -268,7 +292,8 @@ class Handler(http.server.BaseHTTPRequestHandler):
             if path=='/api/session':
                 with db() as con: owner=con.execute('SELECT username FROM owner').fetchone()
                 session=self.session(False)
-                return self.send(200,{'app':'plie-content-cms','configured':bool(owner),'authenticated':bool(session),'username':owner['username'] if session else '', 'csrf':session['csrf'] if session else '', 'local':urlsplit(ORIGIN).hostname in ('127.0.0.1','localhost')})
+                return self.send(200,{'app':'plie-content-cms','configured':bool(owner),'authenticated':bool(session),'username':owner['username'] if session else '', 'csrf':session['csrf'] if session else '', 'local':urlsplit(ORIGIN).hostname in ('127.0.0.1','localhost'), 'publishing':bool(PUBLISHER)})
+            if path=='/api/site-status': self.session(); return self.send(200,publishing_status())
             if path=='/api/posts': self.session(); return self.send(200,{'posts':list_posts()})
             if path=='/api/public/posts':
                 posts=list_posts(True)
@@ -402,9 +427,14 @@ class Handler(http.server.BaseHTTPRequestHandler):
                     incoming.unlink(missing_ok=True)
                     raise
             payload=self.body()
+            if path=='/api/site-sync':
+                if not PUBLISHER: raise Problem('홈페이지 자동 게시가 연결되지 않았습니다.',409)
+                return self.send(200,PUBLISHER.request())
             if path in ('/api/save','/api/publish'):
                 post_id=identifier(payload['id']) if payload.get('id') else uuid.uuid4().hex
-                return self.send(200,change_post(post_id,payload,'publish' if path.endswith('publish') else 'save'))
+                post=change_post(post_id,payload,'publish' if path.endswith('publish') else 'save')
+                if path=='/api/publish': queue_publication()
+                return self.send(200,post)
             if path in ('/api/unpublish','/api/delete'):
                 post_id=identifier(payload.get('id'))
                 with db() as con:
@@ -416,6 +446,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
                     else:
                         con.execute('UPDATE posts SET published=NULL,revision=revision+1,updated=? WHERE id=?',(NOW(),post_id))
                         con.execute("DELETE FROM media_links WHERE post_id=? AND audience='public'",(post_id,))
+                queue_publication()
                 return self.send(200,{'ok':True})
             raise Problem('요청을 찾을 수 없습니다.',404)
         except Problem as error: self.send(error.status,{'error':error.message})
@@ -423,7 +454,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
         except Exception: self.send(500,{'error':'저장하지 못했습니다. 입력 내용은 유지됩니다. 다시 시도해 주세요.'})
 
 def main():
-    global ORIGIN,SECURE
+    global ORIGIN,SECURE,PUBLISHER
     parser=argparse.ArgumentParser()
     parser.add_argument('--port',type=int,default=8766)
     parser.add_argument('--host',default=os.environ.get('CMS_BIND_HOST','127.0.0.1'))
@@ -436,6 +467,14 @@ def main():
     if args.host not in ('127.0.0.1','localhost') and parsed.scheme!='https': parser.error('외부 운영은 HTTPS origin과 역방향 프록시가 필요합니다.')
     SECURE=parsed.scheme=='https'
     initialize(args.data)
+    config_file=DATA/'publish-config.json'
+    if config_file.exists():
+        config=json.loads(config_file.read_text(encoding='utf-8'))
+        if config.get('enabled'):
+            if config.get('remote')!='https://github.com/plie-rg/Plie.git' or config.get('branch')!='main' or config.get('origin')!='https://www.plierg.com' or not re.fullmatch(r'[a-f0-9]{32}',config.get('ownerId','')):
+                parser.error('홈페이지 자동 게시 설정을 확인해 주세요.')
+            from publisher import GitPublisher
+            PUBLISHER=GitPublisher(SITE,DATA,config,public_snapshot,article_html)
     server=http.server.ThreadingHTTPServer((args.host,args.port),Handler)
     server.daemon_threads=True
     print('Plie CMS: '+ORIGIN+'/cms/',flush=True)
