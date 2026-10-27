@@ -17,6 +17,12 @@ let imageCloseButtons = document.querySelectorAll("[data-image-close]");
 
 if (intro) {
   body.classList.add("intro-lock");
+  // Start from page setup so a slow image or external resource cannot hold the logo open.
+  const introDuration = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 1500;
+  window.setTimeout(() => {
+    intro.classList.add("is-hidden");
+    body.classList.remove("intro-lock");
+  }, introDuration);
 }
 
 const showPopup = () => {
@@ -25,13 +31,6 @@ const showPopup = () => {
 };
 
 window.addEventListener("load", () => {
-  if (intro) {
-    window.setTimeout(() => {
-      intro.classList.add("is-hidden");
-      body.classList.remove("intro-lock");
-    }, 1500);
-  }
-
   window.setTimeout(showPopup, 2100);
 });
 
