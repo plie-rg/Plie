@@ -34,6 +34,7 @@ def export_files(posts, media_root, render, origin, sitemap):
     files, summaries = {}, []
     for original in posts:
         post = json.loads(json.dumps(original))
+        post.setdefault('displayMode', 'story')
         if not re.fullmatch(r'[a-f0-9]{32}', post['id']):
             raise PublishError('게시물 주소를 확인해 주세요.')
         for mid, asset in post['media'].items():

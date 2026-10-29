@@ -3,3 +3,12 @@
 .publish-banner{display:flex;gap:12px;justify-content:space-between;align-items:center;flex-wrap:wrap}.publish-banner a{color:inherit;text-decoration:underline}.publish-banner [hidden]{display:none}
 
 .drive-preview,.article-body iframe{width:100%;aspect-ratio:16/9;border:0}.topbar>div{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.topbar .save-state{overflow-wrap:anywhere}
+
+/* Consecutive photos share the same grouped preview as the public album. */
+#preview-content .preview-gallery{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin:28px 0}
+#preview-content .preview-gallery figure{margin:0;min-width:0}
+#preview-content .preview-gallery img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover}
+#preview-content .preview-gallery figcaption{line-height:1.6;margin-top:8px;overflow-wrap:anywhere}
+.archive-import button{margin-top:16px}
+.archive-import [role="status"]{margin-top:12px;white-space:pre-wrap}
+@media(max-width:600px){#preview-content .preview-gallery{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}}

@@ -93,7 +93,9 @@ def validate_post(payload, publish=False):
     title = text(payload.get('title', ''), 100, publish)
     category = payload.get('category', 'class')
     branch = payload.get('branch', 'all')
+    display_mode = payload.get('displayMode', 'story')
     if category not in CATEGORIES or branch not in ('all', 'magok', 'gangnam'): raise Problem('분류와 지점을 확인해 주세요.')
+    if display_mode not in ('story', 'gallery'): raise Problem('표시 방식을 확인해 주세요.')
     blocks = payload.get('blocks', [])
     if not isinstance(blocks, list) or len(blocks) > 100: raise Problem('본문은 100개 블록까지 사용할 수 있습니다.')
     clean, media_ids = [], set()
@@ -122,7 +124,7 @@ def validate_post(payload, publish=False):
     if not cover: cover = next((b['mediaId'] for b in clean if b['type'] in ('image', 'video')), '')
     excerpt = text(payload.get('excerpt', ''), 180)
     if not excerpt: excerpt = next((b['text'][:140] for b in clean if b['type'] == 'text'), '')
-    return {'title': title, 'category': category, 'branch': branch, 'excerpt': excerpt, 'coverId': cover, 'blocks': clean}, media_ids
+    return {'title': title, 'category': category, 'branch': branch, 'displayMode': display_mode, 'excerpt': excerpt, 'coverId': cover, 'blocks': clean}, media_ids
 
 def change_post(post_id, payload, action):
     value, media_ids = validate_post(payload.get('post', {}), publish=action == 'publish')
@@ -155,9 +157,13 @@ def get_post(post_id, public=False):
         row = con.execute('SELECT * FROM posts WHERE id=?', (identifier(post_id),)).fetchone()
         if not row or (public and not row['published']): raise Problem('게시물을 찾을 수 없습니다.', 404)
         value = json.loads(row['published'] if public else row['draft'])
+        value.setdefault('displayMode', 'story')
         assets = con.execute('SELECT m.* FROM media m JOIN media_links l ON l.media_id=m.id WHERE l.post_id=? AND l.audience=?', (post_id, 'public' if public else 'draft')).fetchall()
         value.update(id=post_id, url='/news/' + post_id + '.html', media={asset['id']: media_json(asset) for asset in assets})
-        if not public: value.update(revision=row['revision'], status='published' if row['published'] else 'draft', updated=row['updated'], hasChanges=bool(row['published'] and any(value.get(k) != json.loads(row['published']).get(k) for k in ('title','excerpt','category','branch','coverId','blocks'))))
+        if not public:
+            published = json.loads(row['published']) if row['published'] else None
+            if published is not None: published.setdefault('displayMode', 'story')
+            value.update(revision=row['revision'], status='published' if published else 'draft', updated=row['updated'], hasChanges=bool(published and any(value.get(k) != published.get(k) for k in ('title','excerpt','category','branch','displayMode','coverId','blocks'))))
     return value
 
 def list_posts(public=False):
@@ -210,6 +216,7 @@ def public_snapshot():
         result = []
         for row in con.execute('SELECT id,published FROM posts WHERE published IS NOT NULL ORDER BY updated DESC'):
             post = json.loads(row['published'])
+            post.setdefault('displayMode', 'story')
             assets = con.execute("SELECT m.* FROM media m JOIN media_links l ON l.media_id=m.id WHERE l.post_id=? AND l.audience='public'", (row['id'],)).fetchall()
             post.update(id=row['id'], url='/news/'+row['id']+'.html', media={a['id']:media_json(a) for a in assets})
             result.append(post)
@@ -229,21 +236,34 @@ def article_html(post, origin=None):
     origin = origin or ORIGIN
     title, description = escape(post['title']), escape(post['excerpt'])
     blocks=[]
+    gallery_open = False
     for block in post['blocks']:
         kind=block['type']
+        gallery_image = post.get('displayMode', 'story') == 'gallery' and kind == 'image'
+        if gallery_open and not gallery_image:
+            blocks.append('</div>')
+            gallery_open = False
+        if gallery_image and not gallery_open:
+            blocks.append('<div class="article-gallery">')
+            gallery_open = True
         if kind == 'text': blocks.append('<p>'+escape(block['text']).replace('\n','<br>')+'</p>')
         elif kind == 'heading': blocks.append('<h2>'+escape(block['text'])+'</h2>')
         elif kind in ('image','video'):
             media=post['media'][block['mediaId']]
-            if kind == 'image': body=f'<img src="{media["url"]}" alt="{escape(block["alt"] or post["title"],quote=True)}" loading="lazy" decoding="async">'
-            else: body=f'<video controls playsinline preload="metadata" poster="{media["poster"]}"><source src="{media["url"]}" type="video/mp4">동영상을 재생할 수 없습니다.</video>'
+            source = escape(media['url'], quote=True)
+            if kind == 'image':
+                alt = escape(block['alt'] or post['title'], quote=True)
+                body=f'<img src="{source}" alt="{alt}" loading="lazy" decoding="async">'
+                if gallery_image: body=f'<button class="article-gallery__item" type="button" data-image-open="{source}" aria-label="{alt} 크게 보기">'+body+'</button>'
+            else: body=f'<video controls playsinline preload="metadata" poster="{escape(media["poster"],quote=True)}"><source src="{source}" type="video/mp4">동영상을 재생할 수 없습니다.</video>'
             blocks.append('<figure>'+body+'<figcaption>'+escape(block['caption'])+'</figcaption></figure>')
         elif kind == 'youtube':
             blocks.append(f'<figure><iframe class="youtube" src="https://www.youtube-nocookie.com/embed/{block["videoId"]}" title="{escape(block["caption"] or "플리에 영상",quote=True)}" loading="lazy" allow="fullscreen; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe><figcaption>{escape(block["caption"])}</figcaption></figure>')
+    if gallery_open: blocks.append('</div>')
     canonical=origin+post['url']
     cover=post['media'].get(post['coverId'])
     cover_url=origin+(cover['poster'] or cover['url']) if cover else origin+'/assets/logo.png'
-    schema=json.dumps({'@context':'https://schema.org','@type':'Article','headline':post['title'],'description':post['excerpt'],'datePublished':post['publishedAt'],'dateModified':post['updatedAt'],'image':cover_url,'author':{'@type':'Organization','name':'플리에 리듬체조 아카데미'},'mainEntityOfPage':canonical},ensure_ascii=True).replace('<',r'<')
+    schema=json.dumps({'@context':'https://schema.org','@type':'Article','headline':post['title'],'description':post['excerpt'],'datePublished':post['publishedAt'],'dateModified':post['updatedAt'],'image':cover_url,'author':{'@type':'Organization','name':'플리에 리듬체조 아카데미'},'mainEntityOfPage':canonical},ensure_ascii=True).replace('<',r'\u003c')
     template=(ROOT/'article.html').read_text(encoding='utf-8')
     values={'TITLE':title,'DESCRIPTION':description,'CANONICAL':escape(canonical,quote=True),'COVER':escape(cover_url,quote=True),'CATEGORY':CATEGORIES[post['category']],'DATE':post['publishedAt'][:10].replace('-','.'),'BODY':''.join(blocks),'JSONLD':schema}
     for key,value in values.items(): template=template.replace('{{'+key+'}}',value)
@@ -301,7 +321,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
                     post.pop('blocks',None)
                     post['media']={key:asset for key,asset in post['media'].items() if key==post['coverId']}
                 return self.send(200,{'posts':posts})
-            if path=='/content-config.js': return self.send(200,'window.PLIE_CONTENT_CONFIG = {enabled: true};','application/javascript; charset=utf-8')
+            if path=='/content-config.js': return self.send(200,"window.PLIE_CONTENT_CONFIG = {enabled: true, feed: '/api/public/posts'};",'application/javascript; charset=utf-8')
             if path=='/sitemap.xml':
                 root=ET.fromstring((SITE/'sitemap.xml').read_text(encoding='utf-8'))
                 namespace='http://www.sitemaps.org/schemas/sitemap/0.9'
@@ -331,10 +351,12 @@ class Handler(http.server.BaseHTTPRequestHandler):
                 if not filename or asset['status']!='ready': raise Problem('파일이 아직 준비되지 않았습니다.',404)
                 return self.file(DATA/'media'/filename, ranged=True)
             if re.fullmatch(r'/news/[a-f0-9]{32}\.html',path): return self.send(200,article_html(get_post(path[6:-5],True)),'text/html; charset=utf-8')
+            if path=='/news': return self.send(302,headers={'Location':'/news/'})
+            if path in ('/news/','/news/index.html'): return self.file(SITE/'news'/'index.html')
             if path=='/cms': return self.send(302,headers={'Location':'/cms/'})
             if path in ('/cms/','/cms/index.html'): return self.file(ROOT/'web'/'index.html')
             if path in ('/cms/cms.js','/cms/cms.css'): return self.file(ROOT/'web'/path.rsplit('/',1)[-1])
-            if path in ('/content.js','/content.css'): return self.file(SITE/path[1:])
+            if path in ('/content.js','/content.css','/content/legacy-albums.json','/legacy-archive.js'): return self.file(SITE/path[1:])
             if path=='/': path='/index.html'
             if path in ('/index.html','/videos.html'):
                 source=(SITE/path[1:]).read_text(encoding='utf-8')

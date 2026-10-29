@@ -111,6 +111,23 @@ class PublishingChecks(unittest.TestCase):
         self.pub.config=dict(self.config,ownerId='b'*32)
         with self.assertRaisesRegex(publisher.PublishError,'다른 관리자'): self.pub.push_snapshot()
 
+    def test_export_preserves_gallery_mode_and_defaults_legacy_snapshots(self):
+        payload=self.post(media=True);payload['displayMode']='gallery'
+        app.change_post(self.post_id,{'post':payload},'publish')
+        posts=app.public_snapshot()
+        sitemap=(self.repo/'sitemap.xml').read_text()
+        files=publisher.export_files(posts,self.data/'media',app.article_html,self.config['origin'],sitemap)
+        summary=json.loads(files['content/posts.json'])['posts'][0]
+        self.assertEqual(summary['displayMode'],'gallery')
+        self.assertIn(b'class="article-gallery"',files['news/'+self.post_id+'.html'])
+        self.assertNotIn('blocks',summary)
+        posts[0].pop('displayMode')
+        legacy=publisher.export_files(posts,self.data/'media',app.article_html,self.config['origin'],sitemap)
+        self.assertEqual(json.loads(legacy['content/posts.json'])['posts'][0]['displayMode'],'story')
+        self.assertNotIn(b'class="article-gallery"',legacy['news/'+self.post_id+'.html'])
+        self.assertFalse(publisher.owned('news/index.html'))
+        self.assertFalse(publisher.owned('content/legacy-albums.json'))
+
     def test_media_size_limit_blocks_push_without_changing_remote(self):
         app.change_post(self.post_id,{'post':self.post(media=True)},'publish')
         before=self.remote_file('content/cms-manifest.json')

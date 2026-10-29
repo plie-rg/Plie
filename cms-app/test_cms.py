@@ -120,7 +120,7 @@ class CMSChecks(unittest.TestCase):
         self.assertEqual(self.request(asset['url'],anonymous=True)[0],404)
         self.assertEqual(self.request(asset['url'])[0],200)
     def test_xss_youtube_validation_and_invalid_upload(self):
-        self.login(); payload=self.payload(); payload['post']['title']='<img src=x onerror=alert(1)>'
+        self.login(); payload=self.payload(); payload['post']['title']='</script><script>alert(1)</script>'
         payload['post']['blocks']=[{'type':'text','text':'<script>alert(1)</script>'},{'type':'youtube','url':'https://youtu.be/abcdefghijk','caption':'<img src=x onerror=alert(1)>'}]
         status,_,post=self.request('/api/publish',payload); self.assertEqual(status,200,post)
         html=self.request(post['url'],anonymous=True)[2].decode()
@@ -135,6 +135,75 @@ class CMSChecks(unittest.TestCase):
         self.assertEqual(self.request('/api/posts')[2]['posts'][0]['id'],post['id'])
         self.assertEqual(self.request('/api/public/posts',anonymous=True)[2]['posts'],[])
         self.assertFalse((app.DATA/'.setup-key').exists())
+
+    def test_display_mode_defaults_validation_and_draft_publication(self):
+        self.login(); payload=self.payload()
+        status,_,post=self.request('/api/publish',payload)
+        self.assertEqual(status,200,post)
+        self.assertEqual(post['displayMode'],'story')
+        # A stored post from before display modes existed still reads as a story,
+        # and normalizing its default does not invent an unpublished change.
+        with app.db() as con:
+            row=con.execute('SELECT draft,published FROM posts WHERE id=?',(post['id'],)).fetchone()
+            draft=json.loads(row['draft']); published=json.loads(row['published'])
+            draft.pop('displayMode'); published.pop('displayMode')
+            con.execute('UPDATE posts SET draft=?,published=? WHERE id=?',(json.dumps(draft),json.dumps(published),post['id']))
+        legacy=self.request('/api/posts')[2]['posts'][0]
+        self.assertEqual(legacy['displayMode'],'story')
+        self.assertFalse(legacy['hasChanges'])
+        payload['revision']=post['revision'];payload['post']['displayMode']='gallery'
+        status,_,saved=self.request('/api/save',payload)
+        self.assertEqual(status,200,saved);self.assertTrue(saved['hasChanges'])
+        self.assertEqual(self.request('/api/public/posts',anonymous=True)[2]['posts'][0]['displayMode'],'story')
+        payload['revision']=saved['revision']
+        status,_,published=self.request('/api/publish',payload)
+        self.assertEqual(status,200,published)
+        self.assertFalse(published['hasChanges'])
+        self.assertEqual(self.request('/api/public/posts',anonymous=True)[2]['posts'][0]['displayMode'],'gallery')
+        payload['revision']=published['revision'];payload['post']['displayMode']='untrusted-mode'
+        self.assertEqual(self.request('/api/save',payload)[0],400)
+
+    def test_gallery_groups_consecutive_images_and_keeps_body_order_escaped(self):
+        self.login(); asset=self.photo(); payload=self.payload()
+        image={'type':'image','mediaId':asset['id'],'caption':'<caption> & text','alt':'사진 " onerror="alert(1)'}
+        payload['post'].update(displayMode='gallery',blocks=[image,dict(image),{'type':'text','text':'BETWEEN-PHOTOS'},dict(image),{'type':'youtube','url':'https://youtu.be/abcdefghijk','caption':'AFTER-GALLERY'}])
+        status,_,post=self.request('/api/publish',payload); self.assertEqual(status,200,post)
+        html=self.request(post['url'],anonymous=True)[2].decode()
+        self.assertEqual(html.count('class="article-gallery"'),2)
+        self.assertEqual(html.count('class="article-gallery__item"'),3)
+        self.assertEqual(html.count('data-image-open='),3)
+        self.assertIn('&lt;caption&gt; &amp; text',html)
+        self.assertNotIn(' onerror="alert(1)',html)
+        first,second=html.split('class="article-gallery"')[1:]
+        self.assertEqual(first.count('data-image-open='),2)
+        self.assertIn('</div><p>BETWEEN-PHOTOS</p><div ',first)
+        self.assertIn('</div><figure><iframe',second)
+        payload['revision']=post['revision'];payload['post']['displayMode']='story'
+        status,_,post=self.request('/api/publish',payload);self.assertEqual(status,200,post)
+        story=self.request(post['url'],anonymous=True)[2].decode()
+        self.assertNotIn('class="article-gallery"',story)
+        self.assertNotIn('data-image-open=',story)
+        self.assertIn('BETWEEN-PHOTOS',story)
+
+    def test_news_index_and_legacy_public_routes_are_explicit(self):
+        from unittest.mock import patch
+        root=Path(self.temp.name)/'site';(root/'news').mkdir(parents=True);(root/'content').mkdir()
+        (root/'news/index.html').write_text('<h1>News index</h1><script src="/content-config.js"></script>')
+        (root/'content/legacy-albums.json').write_text('{"version":1,"albums":[]}')
+        (root/'legacy-archive.js').write_text('/* legacy archive routing */')
+        with patch.object(app,'SITE',root):
+            status,headers,_=self.request('/news',anonymous=True)
+            self.assertEqual(status,302);self.assertEqual(headers['Location'],'/news/')
+            for path in ['/news/','/news/index.html','/content/legacy-albums.json','/legacy-archive.js']:
+                self.assertEqual(self.request(path,anonymous=True)[0],200,path)
+            self.assertIn(b'src="/content-config.js"',self.request('/news/',anonymous=True)[2])
+            config_status,config_headers,config=self.request('/content-config.js',anonymous=True)
+            self.assertEqual(config_status,200)
+            self.assertIn(b"feed: '/api/public/posts'",config)
+            self.assertNotIn(b'/content/posts.json',config)
+            self.assertIn('application/javascript',config_headers['Content-Type'])
+            self.assertEqual(self.request('/content/private.json',anonymous=True)[0],404)
+
     def test_real_video_upload_transcodes_and_produces_poster(self):
         self.login(); source=Path(self.temp.name)/'video.mp4'
         subprocess.run([app.imageio_ffmpeg.get_ffmpeg_exe(),'-nostdin','-hide_banner','-loglevel','error','-f','lavfi','-i','color=c=0xc8ad7f:s=160x120:d=0.4','-c:v','libx264','-pix_fmt','yuv420p',str(source)],check=True,timeout=30,creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0))

@@ -7,7 +7,6 @@ const revealTargets = document.querySelectorAll("[data-reveal]");
 const intro = document.querySelector(".intro-overlay");
 const popup = document.querySelector("[data-popup]");
 const popupCloseButtons = document.querySelectorAll("[data-popup-close], [data-popup-anchor]");
-const imageOpenButtons = document.querySelectorAll("[data-image-open]");
 
 let imageModal = document.querySelector("[data-image-modal]");
 let imageModalImg = document.querySelector("[data-image-modal-img]");
@@ -132,8 +131,9 @@ const ensureImageModal = () => {
 
 wireImageCloseButtons();
 
-imageOpenButtons.forEach((button) => {
-  button.addEventListener("click", () => {
+document.addEventListener("click", (event) => {
+    const button = event.target.closest?.("[data-image-open]");
+    if (!button) return;
     ensureImageModal();
     if (!imageModal || !imageModalImg) return;
     const source = button.dataset.imageOpen;
@@ -147,7 +147,6 @@ imageOpenButtons.forEach((button) => {
     imageModal.classList.add("is-open");
     imageModal.setAttribute("aria-hidden", "false");
     imageModal.querySelector("button[data-image-close]")?.focus();
-  });
 });
 
 window.addEventListener("keydown", (event) => {

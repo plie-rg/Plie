@@ -24,6 +24,9 @@ class StaticPreviewTests(unittest.TestCase):
             "content.css": b".journal-grid {}",
             "content.js": b"void 0",
             "content-config.js": b"window.PLIE_CONTENT_CONFIG={enabled:false}",
+            "content/legacy-albums.json": b'{"version":1,"albums":[]}',
+            "news/index.html": b"news index",
+            "legacy-archive.js": b"void 0",
             "script.js": b"console.log('site')",
             "robots.txt": b"User-agent: *",
             "sitemap.xml": b"<urlset/>",
@@ -98,6 +101,8 @@ class StaticPreviewTests(unittest.TestCase):
                 self.assertEqual(body, expected)
                 self.assertEqual(headers["X-Content-Type-Options"], "nosniff")
         self.assertEqual(self.request("/")[2], self.public["index.html"])
+        self.assertEqual(self.request("/news/")[2], self.public["news/index.html"])
+        self.assertEqual(self.request("/news")[1]["Location"], "/news/")
         self.assertEqual(self.request("/%69ndex.html")[2], self.public["index.html"])
         self.assertEqual(self.request("/admin/")[2], self.public["admin/index.html"])
         self.assertEqual(self.request("/admin")[1]["Location"], "/admin/")

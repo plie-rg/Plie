@@ -18,7 +18,7 @@ PUBLIC_ROOT_FILES = frozenset({
     "instructors.html", "kyunghee-cup.html", "ltad.html", "programs.html",
     "recital-2026.html", "rental.html", "videos.html", "styles.css", "script.js",
     "rental-page.css", "rental-page.js", "robots.txt", "sitemap.xml",
-    "content.css", "content.js", "content-config.js",
+    "content.css", "content.js", "content-config.js", "legacy-archive.js",
     "google206b2bc486cb4161.html", "naver56dbb426b948b879447cc8c8ab01c29c.html",
     "naverba1b8398c0f68e8ffc6ea4f286c7d95b.html",
 })
@@ -43,9 +43,9 @@ def is_public_file(parts: tuple[str, ...]) -> bool:
     if len(parts) == 1:
         return parts[0] in PUBLIC_ROOT_FILES
     if parts[0] == "content":
-        return len(parts) == 2 and parts[1] in ("posts.json", "release.json")
+        return len(parts) == 2 and parts[1] in ("posts.json", "release.json", "legacy-albums.json")
     if parts[0] == "news":
-        return len(parts) == 2 and len(parts[1]) == 37 and parts[1].endswith(".html") and all(c in "0123456789abcdef" for c in parts[1][:-5])
+        return len(parts) == 2 and (parts[1] == "index.html" or len(parts[1]) == 37 and parts[1].endswith(".html") and all(c in "0123456789abcdef" for c in parts[1][:-5]))
     if parts[0] == "rental-app":
         return len(parts) == 2 and parts[1] in PUBLIC_RENTAL_FILES
     if parts[0] == "admin":
@@ -80,6 +80,14 @@ def build_handler(directory: Path) -> type[http.server.SimpleHTTPRequestHandler]
                 request_path = unquote(request_url.path, encoding="utf-8", errors="strict")
                 if request_path == "/":
                     request_path = "/index.html"
+                if request_path in ("/news", "/news/"):
+                    if request_path == "/news":
+                        self.send_response(302)
+                        self.send_header("Location", "/news/")
+                        self.send_header("Content-Length", "0")
+                        self.end_headers()
+                        return None
+                    request_path = "/news/index.html"
                 if request_path in ("/admin", "/admin/"):
                     if request_path == "/admin":
                         self.send_response(302)

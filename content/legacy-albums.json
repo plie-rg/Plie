@@ -1,0 +1,615 @@
+{
+  "version": 1,
+  "albums": [
+    {
+      "key": "kyunghee-cup",
+      "id": "1e98e803d01fa54a07c0bfb1d9b056a7",
+      "title": "플리에 경희대배",
+      "excerpt": "경희대배에 참가한 아이들의 경기와 현장 기록입니다.",
+      "category": "competition",
+      "branch": "all",
+      "displayMode": "gallery",
+      "legacyUrl": "/kyunghee-cup.html",
+      "coverId": "81bc616c971c0fbf002b53813bf87465",
+      "blocks": [
+        {
+          "type": "text",
+          "text": "대회 현장의 분위기와 아이들의 순간을 한눈에 볼 수 있도록 행사별 아카이브로 정리했습니다."
+        },
+        {
+          "type": "image",
+          "mediaId": "81bc616c971c0fbf002b53813bf87465",
+          "alt": "플리에 경희대배 사진 1",
+          "caption": ""
+        },
+        {
+          "type": "image",
+          "mediaId": "55f21a7e728024e116c0913d08dfee6a",
+          "alt": "플리에 경희대배 사진 2",
+          "caption": ""
+        },
+        {
+          "type": "image",
+          "mediaId": "380bc404e9d6c0d34cba3f8222fea6b7",
+          "alt": "플리에 경희대배 사진 3",
+          "caption": ""
+        },
+        {
+          "type": "image",
+          "mediaId": "a6a1d100a4ec42e160f0f653835c4b67",
+          "alt": "플리에 경희대배 사진 4",
+          "caption": ""
+        },
+        {
+          "type": "image",
+          "mediaId": "802fbb889188bb632491f483f6d32ea0",
+          "alt": "플리에 경희대배 사진 5",
+          "caption": ""
+        },
+        {
+          "type": "image",
+          "mediaId": "95c2e58bc6187bdf8118e0277009c56c",
+          "alt": "플리에 경희대배 사진 6",
+          "caption": ""
+        },
+        {
+          "type": "image",
+          "mediaId": "470927a15e2f3abad02393a3afe94606",
+          "alt": "플리에 경희대배 사진 7",
+          "caption": ""
+        },
+        {
+          "type": "image",
+          "mediaId": "957cf163a6347000c81a2d5c7deb0092",
+          "alt": "플리에 경희대배 사진 8",
+          "caption": ""
+        },
+        {
+          "type": "image",
+          "mediaId": "736a8e2d35fd998e6c045ec136521637",
+          "alt": "플리에 경희대배 사진 9",
+          "caption": ""
+        },
+        {
+          "type": "image",
+          "mediaId": "8d0d5873063185d75417d1702605aab8",
+          "alt": "플리에 경희대배 사진 10",
+          "caption": ""
+        },
+        {
+          "type": "image",
+          "mediaId": "f1cfadf0a592ef923491e27633488b2c",
+          "alt": "플리에 경희대배 사진 11",
+          "caption": ""
+        },
+        {
+          "type": "image",
+          "mediaId": "bbb5dd42fb728869a778da6fa509e7c8",
+          "alt": "플리에 경희대배 사진 12",
+          "caption": ""
+        },
+        {
+          "type": "image",
+          "mediaId": "be6de53cbbfe9dc0beef85b30b1037a0",
+          "alt": "플리에 경희대배 사진 13",
+          "caption": ""
+        },
+        {
+          "type": "image",
+          "mediaId": "503763d96f0ba43d31e9c930dbfb5808",
+          "alt": "플리에 경희대배 사진 14",
+          "caption": ""
+        },
+        {
+          "type": "image",
+          "mediaId": "8e73b571c0540e10688da08b4628ac5a",
+          "alt": "플리에 경희대배 사진 15",
+          "caption": ""
+        },
+        {
+          "type": "image",
+          "mediaId": "b2b5a7b8f5232d9e5b67c7d05aa4c09e",
+          "alt": "플리에 경희대배 사진 16",
+          "caption": ""
+        },
+        {
+          "type": "image",
+          "mediaId": "3a94b5712e598779a6efaaae1528e6d2",
+          "alt": "플리에 경희대배 사진 17",
+          "caption": ""
+        },
+        {
+          "type": "image",
+          "mediaId": "57234f36bef90c5dc74f0433ad543dbc",
+          "alt": "플리에 경희대배 사진 18",
+          "caption": ""
+        },
+        {
+          "type": "image",
+          "mediaId": "91c9bd6236c16f275d7f9333f9c7cb63",
+          "alt": "플리에 경희대배 사진 19",
+          "caption": ""
+        },
+        {
+          "type": "image",
+          "mediaId": "473d71d3d8199be8c8c8cd734269ca9d",
+          "alt": "플리에 경희대배 사진 20",
+          "caption": ""
+        },
+        {
+          "type": "image",
+          "mediaId": "473aeaaa282ac33c5c260d0100c2cdfc",
+          "alt": "플리에 경희대배 사진 21",
+          "caption": ""
+        },
+        {
+          "type": "image",
+          "mediaId": "430f18fd78f566bb18f5b6dfd5180f6c",
+          "alt": "플리에 경희대배 사진 22",
+          "caption": ""
+        },
+        {
+          "type": "image",
+          "mediaId": "647718e299d5be387be49a19a753fca5",
+          "alt": "플리에 경희대배 사진 23",
+          "caption": ""
+        },
+        {
+          "type": "image",
+          "mediaId": "278f861e0387a0364735d972478c6fbf",
+          "alt": "플리에 경희대배 사진 24",
+          "caption": ""
+        },
+        {
+          "type": "image",
+          "mediaId": "5b2da4fb139d04d074c5bcdbee552853",
+          "alt": "플리에 경희대배 사진 25",
+          "caption": ""
+        },
+        {
+          "type": "image",
+          "mediaId": "b57f97ef6c993be1bd5dee0010e50a4a",
+          "alt": "플리에 경희대배 사진 26",
+          "caption": ""
+        },
+        {
+          "type": "image",
+          "mediaId": "0d194e3277859ce67b35291002ddb71b",
+          "alt": "플리에 경희대배 사진 27",
+          "caption": ""
+        },
+        {
+          "type": "image",
+          "mediaId": "72752b99ed65dc864646a5e6917d6b40",
+          "alt": "플리에 경희대배 사진 28",
+          "caption": ""
+        },
+        {
+          "type": "image",
+          "mediaId": "d118e3d0a54b5990fceb7d6c3985690c",
+          "alt": "플리에 경희대배 사진 29",
+          "caption": ""
+        },
+        {
+          "type": "image",
+          "mediaId": "e44363fb929a22be604be5f84184f8c4",
+          "alt": "플리에 경희대배 사진 30",
+          "caption": ""
+        }
+      ],
+      "media": {
+        "81bc616c971c0fbf002b53813bf87465": {
+          "id": "81bc616c971c0fbf002b53813bf87465",
+          "kind": "image",
+          "sourcePath": "assets/events/kyunghee-cup/kyunghee-cup-01.jpg",
+          "thumbnailPath": "assets/events/kyunghee-cup/thumbs/kyunghee-cup-01.jpg",
+          "size": 8490026
+        },
+        "55f21a7e728024e116c0913d08dfee6a": {
+          "id": "55f21a7e728024e116c0913d08dfee6a",
+          "kind": "image",
+          "sourcePath": "assets/events/kyunghee-cup/kyunghee-cup-02.jpg",
+          "thumbnailPath": "assets/events/kyunghee-cup/thumbs/kyunghee-cup-02.jpg",
+          "size": 4091321
+        },
+        "380bc404e9d6c0d34cba3f8222fea6b7": {
+          "id": "380bc404e9d6c0d34cba3f8222fea6b7",
+          "kind": "image",
+          "sourcePath": "assets/events/kyunghee-cup/kyunghee-cup-03.jpg",
+          "thumbnailPath": "assets/events/kyunghee-cup/thumbs/kyunghee-cup-03.jpg",
+          "size": 4191654
+        },
+        "a6a1d100a4ec42e160f0f653835c4b67": {
+          "id": "a6a1d100a4ec42e160f0f653835c4b67",
+          "kind": "image",
+          "sourcePath": "assets/events/kyunghee-cup/kyunghee-cup-04.jpg",
+          "thumbnailPath": "assets/events/kyunghee-cup/thumbs/kyunghee-cup-04.jpg",
+          "size": 4100760
+        },
+        "802fbb889188bb632491f483f6d32ea0": {
+          "id": "802fbb889188bb632491f483f6d32ea0",
+          "kind": "image",
+          "sourcePath": "assets/events/kyunghee-cup/kyunghee-cup-05.jpg",
+          "thumbnailPath": "assets/events/kyunghee-cup/thumbs/kyunghee-cup-05.jpg",
+          "size": 3615344
+        },
+        "95c2e58bc6187bdf8118e0277009c56c": {
+          "id": "95c2e58bc6187bdf8118e0277009c56c",
+          "kind": "image",
+          "sourcePath": "assets/events/kyunghee-cup/kyunghee-cup-06.jpg",
+          "thumbnailPath": "assets/events/kyunghee-cup/thumbs/kyunghee-cup-06.jpg",
+          "size": 6858094
+        },
+        "470927a15e2f3abad02393a3afe94606": {
+          "id": "470927a15e2f3abad02393a3afe94606",
+          "kind": "image",
+          "sourcePath": "assets/events/kyunghee-cup/kyunghee-cup-07.jpg",
+          "thumbnailPath": "assets/events/kyunghee-cup/thumbs/kyunghee-cup-07.jpg",
+          "size": 6236175
+        },
+        "957cf163a6347000c81a2d5c7deb0092": {
+          "id": "957cf163a6347000c81a2d5c7deb0092",
+          "kind": "image",
+          "sourcePath": "assets/events/kyunghee-cup/kyunghee-cup-08.jpg",
+          "thumbnailPath": "assets/events/kyunghee-cup/thumbs/kyunghee-cup-08.jpg",
+          "size": 5724694
+        },
+        "736a8e2d35fd998e6c045ec136521637": {
+          "id": "736a8e2d35fd998e6c045ec136521637",
+          "kind": "image",
+          "sourcePath": "assets/events/kyunghee-cup/kyunghee-cup-09.jpg",
+          "thumbnailPath": "assets/events/kyunghee-cup/thumbs/kyunghee-cup-09.jpg",
+          "size": 6534258
+        },
+        "8d0d5873063185d75417d1702605aab8": {
+          "id": "8d0d5873063185d75417d1702605aab8",
+          "kind": "image",
+          "sourcePath": "assets/events/kyunghee-cup/kyunghee-cup-10.jpg",
+          "thumbnailPath": "assets/events/kyunghee-cup/thumbs/kyunghee-cup-10.jpg",
+          "size": 7138175
+        },
+        "f1cfadf0a592ef923491e27633488b2c": {
+          "id": "f1cfadf0a592ef923491e27633488b2c",
+          "kind": "image",
+          "sourcePath": "assets/events/kyunghee-cup/kyunghee-cup-11.jpg",
+          "thumbnailPath": "assets/events/kyunghee-cup/thumbs/kyunghee-cup-11.jpg",
+          "size": 3923715
+        },
+        "bbb5dd42fb728869a778da6fa509e7c8": {
+          "id": "bbb5dd42fb728869a778da6fa509e7c8",
+          "kind": "image",
+          "sourcePath": "assets/events/kyunghee-cup/kyunghee-cup-12.jpg",
+          "thumbnailPath": "assets/events/kyunghee-cup/thumbs/kyunghee-cup-12.jpg",
+          "size": 3197127
+        },
+        "be6de53cbbfe9dc0beef85b30b1037a0": {
+          "id": "be6de53cbbfe9dc0beef85b30b1037a0",
+          "kind": "image",
+          "sourcePath": "assets/events/kyunghee-cup/kyunghee-cup-13.jpg",
+          "thumbnailPath": "assets/events/kyunghee-cup/thumbs/kyunghee-cup-13.jpg",
+          "size": 3277518
+        },
+        "503763d96f0ba43d31e9c930dbfb5808": {
+          "id": "503763d96f0ba43d31e9c930dbfb5808",
+          "kind": "image",
+          "sourcePath": "assets/events/kyunghee-cup/kyunghee-cup-14.jpg",
+          "thumbnailPath": "assets/events/kyunghee-cup/thumbs/kyunghee-cup-14.jpg",
+          "size": 2397737
+        },
+        "8e73b571c0540e10688da08b4628ac5a": {
+          "id": "8e73b571c0540e10688da08b4628ac5a",
+          "kind": "image",
+          "sourcePath": "assets/events/kyunghee-cup/kyunghee-cup-15.jpg",
+          "thumbnailPath": "assets/events/kyunghee-cup/thumbs/kyunghee-cup-15.jpg",
+          "size": 4583285
+        },
+        "b2b5a7b8f5232d9e5b67c7d05aa4c09e": {
+          "id": "b2b5a7b8f5232d9e5b67c7d05aa4c09e",
+          "kind": "image",
+          "sourcePath": "assets/events/kyunghee-cup/kyunghee-cup-16.jpg",
+          "thumbnailPath": "assets/events/kyunghee-cup/thumbs/kyunghee-cup-16.jpg",
+          "size": 3414774
+        },
+        "3a94b5712e598779a6efaaae1528e6d2": {
+          "id": "3a94b5712e598779a6efaaae1528e6d2",
+          "kind": "image",
+          "sourcePath": "assets/events/kyunghee-cup/kyunghee-cup-17.jpg",
+          "thumbnailPath": "assets/events/kyunghee-cup/thumbs/kyunghee-cup-17.jpg",
+          "size": 3215082
+        },
+        "57234f36bef90c5dc74f0433ad543dbc": {
+          "id": "57234f36bef90c5dc74f0433ad543dbc",
+          "kind": "image",
+          "sourcePath": "assets/events/kyunghee-cup/kyunghee-cup-18.jpg",
+          "thumbnailPath": "assets/events/kyunghee-cup/thumbs/kyunghee-cup-18.jpg",
+          "size": 3825223
+        },
+        "91c9bd6236c16f275d7f9333f9c7cb63": {
+          "id": "91c9bd6236c16f275d7f9333f9c7cb63",
+          "kind": "image",
+          "sourcePath": "assets/events/kyunghee-cup/kyunghee-cup-19.jpg",
+          "thumbnailPath": "assets/events/kyunghee-cup/thumbs/kyunghee-cup-19.jpg",
+          "size": 4991723
+        },
+        "473d71d3d8199be8c8c8cd734269ca9d": {
+          "id": "473d71d3d8199be8c8c8cd734269ca9d",
+          "kind": "image",
+          "sourcePath": "assets/events/kyunghee-cup/kyunghee-cup-20.jpg",
+          "thumbnailPath": "assets/events/kyunghee-cup/thumbs/kyunghee-cup-20.jpg",
+          "size": 3052059
+        },
+        "473aeaaa282ac33c5c260d0100c2cdfc": {
+          "id": "473aeaaa282ac33c5c260d0100c2cdfc",
+          "kind": "image",
+          "sourcePath": "assets/events/kyunghee-cup/kyunghee-cup-21.jpg",
+          "thumbnailPath": "assets/events/kyunghee-cup/thumbs/kyunghee-cup-21.jpg",
+          "size": 4651980
+        },
+        "430f18fd78f566bb18f5b6dfd5180f6c": {
+          "id": "430f18fd78f566bb18f5b6dfd5180f6c",
+          "kind": "image",
+          "sourcePath": "assets/events/kyunghee-cup/kyunghee-cup-22.jpg",
+          "thumbnailPath": "assets/events/kyunghee-cup/thumbs/kyunghee-cup-22.jpg",
+          "size": 6084281
+        },
+        "647718e299d5be387be49a19a753fca5": {
+          "id": "647718e299d5be387be49a19a753fca5",
+          "kind": "image",
+          "sourcePath": "assets/events/kyunghee-cup/kyunghee-cup-23.jpg",
+          "thumbnailPath": "assets/events/kyunghee-cup/thumbs/kyunghee-cup-23.jpg",
+          "size": 6220827
+        },
+        "278f861e0387a0364735d972478c6fbf": {
+          "id": "278f861e0387a0364735d972478c6fbf",
+          "kind": "image",
+          "sourcePath": "assets/events/kyunghee-cup/kyunghee-cup-24.jpg",
+          "thumbnailPath": "assets/events/kyunghee-cup/thumbs/kyunghee-cup-24.jpg",
+          "size": 5644583
+        },
+        "5b2da4fb139d04d074c5bcdbee552853": {
+          "id": "5b2da4fb139d04d074c5bcdbee552853",
+          "kind": "image",
+          "sourcePath": "assets/events/kyunghee-cup/kyunghee-cup-25.jpg",
+          "thumbnailPath": "assets/events/kyunghee-cup/thumbs/kyunghee-cup-25.jpg",
+          "size": 7800177
+        },
+        "b57f97ef6c993be1bd5dee0010e50a4a": {
+          "id": "b57f97ef6c993be1bd5dee0010e50a4a",
+          "kind": "image",
+          "sourcePath": "assets/events/kyunghee-cup/kyunghee-cup-26.jpg",
+          "thumbnailPath": "assets/events/kyunghee-cup/thumbs/kyunghee-cup-26.jpg",
+          "size": 4341956
+        },
+        "0d194e3277859ce67b35291002ddb71b": {
+          "id": "0d194e3277859ce67b35291002ddb71b",
+          "kind": "image",
+          "sourcePath": "assets/events/kyunghee-cup/kyunghee-cup-27.jpg",
+          "thumbnailPath": "assets/events/kyunghee-cup/thumbs/kyunghee-cup-27.jpg",
+          "size": 4210965
+        },
+        "72752b99ed65dc864646a5e6917d6b40": {
+          "id": "72752b99ed65dc864646a5e6917d6b40",
+          "kind": "image",
+          "sourcePath": "assets/events/kyunghee-cup/kyunghee-cup-28.jpg",
+          "thumbnailPath": "assets/events/kyunghee-cup/thumbs/kyunghee-cup-28.jpg",
+          "size": 5909788
+        },
+        "d118e3d0a54b5990fceb7d6c3985690c": {
+          "id": "d118e3d0a54b5990fceb7d6c3985690c",
+          "kind": "image",
+          "sourcePath": "assets/events/kyunghee-cup/kyunghee-cup-29.jpg",
+          "thumbnailPath": "assets/events/kyunghee-cup/thumbs/kyunghee-cup-29.jpg",
+          "size": 4405261
+        },
+        "e44363fb929a22be604be5f84184f8c4": {
+          "id": "e44363fb929a22be604be5f84184f8c4",
+          "kind": "image",
+          "sourcePath": "assets/events/kyunghee-cup/kyunghee-cup-30.jpg",
+          "thumbnailPath": "assets/events/kyunghee-cup/thumbs/kyunghee-cup-30.jpg",
+          "size": 4067961
+        }
+      }
+    },
+    {
+      "key": "recital-2026",
+      "id": "afa6bc71c9593fcb1fe474aacea4580f",
+      "title": "플리에 정기발표회",
+      "excerpt": "함께 준비한 작품과 무대 위 순간을 사진으로 만나보세요.",
+      "category": "event",
+      "branch": "all",
+      "displayMode": "gallery",
+      "legacyUrl": "/recital-2026.html",
+      "coverId": "b35203c90b1b361f71409f78d174558c",
+      "blocks": [
+        {
+          "type": "text",
+          "text": "함께 연습한 작품을 무대에서 선보인 날의 기록입니다."
+        },
+        {
+          "type": "image",
+          "mediaId": "b35203c90b1b361f71409f78d174558c",
+          "alt": "플리에 정기발표회 사진 1",
+          "caption": ""
+        },
+        {
+          "type": "image",
+          "mediaId": "adf2883d33a9cfb876f29ef098fdf548",
+          "alt": "플리에 정기발표회 사진 2",
+          "caption": ""
+        },
+        {
+          "type": "image",
+          "mediaId": "e49c0b97a59954322a85392398fb91cb",
+          "alt": "플리에 정기발표회 사진 3",
+          "caption": ""
+        },
+        {
+          "type": "image",
+          "mediaId": "bc3db3a0c11c3c11aa70e7d779d2fca7",
+          "alt": "플리에 정기발표회 사진 4",
+          "caption": ""
+        },
+        {
+          "type": "image",
+          "mediaId": "97d6ac78d720d9bd0d01ac72b164b3ce",
+          "alt": "플리에 정기발표회 사진 5",
+          "caption": ""
+        },
+        {
+          "type": "image",
+          "mediaId": "4c2bab07255a51a82e9b3e93aea9c0c5",
+          "alt": "플리에 정기발표회 사진 6",
+          "caption": ""
+        },
+        {
+          "type": "image",
+          "mediaId": "ceb6114bde3b92c7b35054ac7c69a400",
+          "alt": "플리에 정기발표회 사진 7",
+          "caption": ""
+        },
+        {
+          "type": "image",
+          "mediaId": "5443e62c0c7ddccdd94a78dbab5f8784",
+          "alt": "플리에 정기발표회 사진 8",
+          "caption": ""
+        },
+        {
+          "type": "image",
+          "mediaId": "ea5c902ee28c10960b9545b63bb37ace",
+          "alt": "플리에 정기발표회 사진 9",
+          "caption": ""
+        },
+        {
+          "type": "image",
+          "mediaId": "6131c59e11fe9425c4b45e1232bfbae4",
+          "alt": "플리에 정기발표회 사진 10",
+          "caption": ""
+        },
+        {
+          "type": "image",
+          "mediaId": "1a2bea2bb35f54414279563a5a15864e",
+          "alt": "플리에 정기발표회 사진 11",
+          "caption": ""
+        },
+        {
+          "type": "image",
+          "mediaId": "4c77ff0e14f5ce78624f548e96b79161",
+          "alt": "플리에 정기발표회 사진 12",
+          "caption": ""
+        },
+        {
+          "type": "image",
+          "mediaId": "08502342861d2b2e148318322179c620",
+          "alt": "플리에 정기발표회 사진 13",
+          "caption": ""
+        },
+        {
+          "type": "image",
+          "mediaId": "e362cd77cb8aa8c6e2b09e4ad474cf05",
+          "alt": "플리에 정기발표회 사진 14",
+          "caption": ""
+        }
+      ],
+      "media": {
+        "b35203c90b1b361f71409f78d174558c": {
+          "id": "b35203c90b1b361f71409f78d174558c",
+          "kind": "image",
+          "sourcePath": "assets/events/recital-2026/recital-2026-01.jpg",
+          "thumbnailPath": "assets/events/recital-2026/thumbs/recital-2026-01.jpg",
+          "size": 464420
+        },
+        "adf2883d33a9cfb876f29ef098fdf548": {
+          "id": "adf2883d33a9cfb876f29ef098fdf548",
+          "kind": "image",
+          "sourcePath": "assets/events/recital-2026/recital-2026-02.jpg",
+          "thumbnailPath": "assets/events/recital-2026/thumbs/recital-2026-02.jpg",
+          "size": 2737802
+        },
+        "e49c0b97a59954322a85392398fb91cb": {
+          "id": "e49c0b97a59954322a85392398fb91cb",
+          "kind": "image",
+          "sourcePath": "assets/events/recital-2026/recital-2026-03.jpg",
+          "thumbnailPath": "assets/events/recital-2026/thumbs/recital-2026-03.jpg",
+          "size": 3802412
+        },
+        "bc3db3a0c11c3c11aa70e7d779d2fca7": {
+          "id": "bc3db3a0c11c3c11aa70e7d779d2fca7",
+          "kind": "image",
+          "sourcePath": "assets/events/recital-2026/recital-2026-04.jpg",
+          "thumbnailPath": "assets/events/recital-2026/thumbs/recital-2026-04.jpg",
+          "size": 2219701
+        },
+        "97d6ac78d720d9bd0d01ac72b164b3ce": {
+          "id": "97d6ac78d720d9bd0d01ac72b164b3ce",
+          "kind": "image",
+          "sourcePath": "assets/events/recital-2026/recital-2026-05.jpg",
+          "thumbnailPath": "assets/events/recital-2026/thumbs/recital-2026-05.jpg",
+          "size": 462367
+        },
+        "4c2bab07255a51a82e9b3e93aea9c0c5": {
+          "id": "4c2bab07255a51a82e9b3e93aea9c0c5",
+          "kind": "image",
+          "sourcePath": "assets/events/recital-2026/recital-2026-06.jpg",
+          "thumbnailPath": "assets/events/recital-2026/thumbs/recital-2026-06.jpg",
+          "size": 3479288
+        },
+        "ceb6114bde3b92c7b35054ac7c69a400": {
+          "id": "ceb6114bde3b92c7b35054ac7c69a400",
+          "kind": "image",
+          "sourcePath": "assets/events/recital-2026/recital-2026-07.jpg",
+          "thumbnailPath": "assets/events/recital-2026/thumbs/recital-2026-07.jpg",
+          "size": 2412291
+        },
+        "5443e62c0c7ddccdd94a78dbab5f8784": {
+          "id": "5443e62c0c7ddccdd94a78dbab5f8784",
+          "kind": "image",
+          "sourcePath": "assets/events/recital-2026/recital-2026-08.jpg",
+          "thumbnailPath": "assets/events/recital-2026/thumbs/recital-2026-08.jpg",
+          "size": 4030338
+        },
+        "ea5c902ee28c10960b9545b63bb37ace": {
+          "id": "ea5c902ee28c10960b9545b63bb37ace",
+          "kind": "image",
+          "sourcePath": "assets/events/recital-2026/thumbs/recital-2026-09.jpg",
+          "thumbnailPath": "assets/events/recital-2026/thumbs/recital-2026-09.jpg",
+          "size": 137805
+        },
+        "6131c59e11fe9425c4b45e1232bfbae4": {
+          "id": "6131c59e11fe9425c4b45e1232bfbae4",
+          "kind": "image",
+          "sourcePath": "assets/events/recital-2026/recital-2026-10.jpg",
+          "thumbnailPath": "assets/events/recital-2026/thumbs/recital-2026-10.jpg",
+          "size": 2745580
+        },
+        "1a2bea2bb35f54414279563a5a15864e": {
+          "id": "1a2bea2bb35f54414279563a5a15864e",
+          "kind": "image",
+          "sourcePath": "assets/events/recital-2026/recital-2026-11.jpg",
+          "thumbnailPath": "assets/events/recital-2026/thumbs/recital-2026-11.jpg",
+          "size": 7558890
+        },
+        "4c77ff0e14f5ce78624f548e96b79161": {
+          "id": "4c77ff0e14f5ce78624f548e96b79161",
+          "kind": "image",
+          "sourcePath": "assets/events/recital-2026/recital-2026-12.jpg",
+          "thumbnailPath": "assets/events/recital-2026/thumbs/recital-2026-12.jpg",
+          "size": 7027843
+        },
+        "08502342861d2b2e148318322179c620": {
+          "id": "08502342861d2b2e148318322179c620",
+          "kind": "image",
+          "sourcePath": "assets/events/recital-2026/recital-2026-13.jpg",
+          "thumbnailPath": "assets/events/recital-2026/thumbs/recital-2026-13.jpg",
+          "size": 7784140
+        },
+        "e362cd77cb8aa8c6e2b09e4ad474cf05": {
+          "id": "e362cd77cb8aa8c6e2b09e4ad474cf05",
+          "kind": "image",
+          "sourcePath": "assets/events/recital-2026/recital-2026-14.jpg",
+          "thumbnailPath": "assets/events/recital-2026/thumbs/recital-2026-14.jpg",
+          "size": 7830330
+        }
+      }
+    }
+  ]
+}
