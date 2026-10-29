@@ -4,6 +4,26 @@
   const categories = {notice:'공지사항',class:'수업 이야기',event:'행사 · 발표회',competition:'대회 소식'};
   const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const safeUrl = value => typeof value === 'string' && /^\/(?!\/)[A-Za-z0-9_./-]+$/.test(value) ? value : '';
+  function eventDate(value) {
+    if (typeof value !== 'string') return '';
+    const match = /^([1-9]\d{3})-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/.exec(value);
+    if (!match) return '';
+    const year = Number(match[1]), month = Number(match[2]), day = Number(match[3]);
+    const days = [31,year%4===0&&(year%100!==0||year%400===0)?29:28,31,30,31,30,31,31,30,31,30,31];
+    return day <= days[month-1] ? value : '';
+  }
+  function datedPost(post, catalog) {
+    // Only restore a verified archive date when an older CMS omitted the field.
+    // An explicit empty date is the operator's choice and must stay empty.
+    const archive = (catalog.albums || []).find(a => a.key === post.legacyKey && a.id === post.id);
+    const date = Object.hasOwn(post, 'eventDate') ? post.eventDate : archive?.eventDate;
+    return {...post, eventDate:eventDate(date)};
+  }
+  function chronological(a, b) {
+    return b.eventDate.localeCompare(a.eventDate)
+      || String(b.publishedAt || '').localeCompare(String(a.publishedAt || ''))
+      || String(a.id || '').localeCompare(String(b.id || ''));
+  }
   async function json(url) {
     const response = await fetch(url, {cache:'no-cache'});
     if (!response.ok) throw new Error('소식을 불러오지 못했습니다.');
@@ -24,8 +44,8 @@
     const url = safeUrl(post.url);
     if (!url) return '';
     const gallery = post.displayMode === 'gallery';
-    const date = post.publishedAt?.slice(0,10);
-    return `<article class="journal-card"><a href="${esc(url)}" class="journal-photo" aria-label="${esc(post.title)}">${image ? `<img src="${esc(image)}" alt="${esc(post.title)}" loading="lazy" decoding="async">` : '<span>plié.</span>'}${gallery ? '<span class="journal-kind">사진첩</span>' : ''}</a><div class="journal-copy"><div class="journal-meta"><span>${categories[post.category] || '플리에 소식'}</span>${date ? `<time datetime="${esc(date)}">${esc(date.replaceAll('-','.'))}</time>` : '<span>행사 기록</span>'}</div><h2><a href="${esc(url)}">${esc(post.title)}</a></h2><p>${esc(post.excerpt)}</p><a class="journal-read" href="${esc(url)}">${gallery ? '사진첩 보기' : '이야기 읽기'} ↗</a></div></article>`;
+    const date = post.eventDate;
+    return `<article class="journal-card"><a href="${esc(url)}" class="journal-photo" aria-label="${esc(post.title)}">${image ? `<img src="${esc(image)}" alt="${esc(post.title)}" loading="lazy" decoding="async">` : '<span>plié.</span>'}${gallery ? '<span class="journal-kind">사진첩</span>' : ''}</a><div class="journal-copy"><div class="journal-meta"><span>${categories[post.category] || '플리에 소식'}</span>${date ? `<time datetime="${esc(date)}">${esc(date.replaceAll('-','.'))}</time>` : '<span>행사 날짜 미입력</span>'}</div><h2><a href="${esc(url)}">${esc(post.title)}</a></h2><p>${esc(post.excerpt)}</p><a class="journal-read" href="${esc(url)}">${gallery ? '사진첩 보기' : '이야기 읽기'} ↗</a></div></article>`;
   }
   async function start() {
     try {
@@ -34,7 +54,8 @@
         json('/content/legacy-albums.json').catch(() => ({albums:[]}))
       ]);
       if (!Array.isArray(feed.posts)) throw new Error('Invalid feed');
-      const posts = [...feed.posts, ...legacyPosts(catalog, feed)];
+      const posts = [...feed.posts, ...legacyPosts(catalog, feed)]
+        .map(post => datedPost(post, catalog)).sort(chronological);
       document.querySelectorAll('[data-cms-section]').forEach(section => {
         const home = section.dataset.cmsSection === 'home';
         if (home && !posts.length) return;

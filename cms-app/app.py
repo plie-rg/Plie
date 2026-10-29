@@ -4,7 +4,7 @@ import argparse, contextlib, hashlib, hmac, http.cookies, http.server, json, mim
 import re, secrets, shutil, sqlite3, subprocess, sys, threading, time, uuid
 import xml.etree.ElementTree as ET
 from concurrent.futures import ThreadPoolExecutor
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from html import escape
 from pathlib import Path
 from urllib.parse import parse_qs, urlsplit
@@ -75,6 +75,21 @@ def text(value, limit, required=False):
     if len(value) > limit or (required and not value): raise Problem('필수 항목과 글자 수를 확인해 주세요.')
     return value
 
+def event_date(value):
+    if value == '': return ''
+    if not isinstance(value, str) or not re.fullmatch(r'[1-9][0-9]{3}-[0-9]{2}-[0-9]{2}', value):
+        raise Problem('행사 날짜는 YYYY-MM-DD 형식으로 입력해 주세요.')
+    try: date.fromisoformat(value)
+    except ValueError: raise Problem('실제 달력에 있는 행사 날짜를 입력해 주세요.')
+    return value
+
+def chronological_posts(posts):
+    # Stable ties use the initial publication and ID, never a later draft edit.
+    posts = sorted(posts, key=lambda post: post['id'])
+    posts.sort(key=lambda post: post.get('publishedAt') or '', reverse=True)
+    posts.sort(key=lambda post: post.get('eventDate') or '', reverse=True)
+    return posts
+
 def youtube_id(value):
     try:
         url = urlsplit(value)
@@ -94,6 +109,7 @@ def validate_post(payload, publish=False):
     category = payload.get('category', 'class')
     branch = payload.get('branch', 'all')
     display_mode = payload.get('displayMode', 'story')
+    event_day = event_date(payload.get('eventDate', ''))
     if category not in CATEGORIES or branch not in ('all', 'magok', 'gangnam'): raise Problem('분류와 지점을 확인해 주세요.')
     if display_mode not in ('story', 'gallery'): raise Problem('표시 방식을 확인해 주세요.')
     blocks = payload.get('blocks', [])
@@ -124,7 +140,7 @@ def validate_post(payload, publish=False):
     if not cover: cover = next((b['mediaId'] for b in clean if b['type'] in ('image', 'video')), '')
     excerpt = text(payload.get('excerpt', ''), 180)
     if not excerpt: excerpt = next((b['text'][:140] for b in clean if b['type'] == 'text'), '')
-    return {'title': title, 'category': category, 'branch': branch, 'displayMode': display_mode, 'excerpt': excerpt, 'coverId': cover, 'blocks': clean}, media_ids
+    return {'title': title, 'category': category, 'branch': branch, 'displayMode': display_mode, 'eventDate': event_day, 'excerpt': excerpt, 'coverId': cover, 'blocks': clean}, media_ids
 
 def change_post(post_id, payload, action):
     value, media_ids = validate_post(payload.get('post', {}), publish=action == 'publish')
@@ -158,17 +174,20 @@ def get_post(post_id, public=False):
         if not row or (public and not row['published']): raise Problem('게시물을 찾을 수 없습니다.', 404)
         value = json.loads(row['published'] if public else row['draft'])
         value.setdefault('displayMode', 'story')
+        value.setdefault('eventDate', '')
         assets = con.execute('SELECT m.* FROM media m JOIN media_links l ON l.media_id=m.id WHERE l.post_id=? AND l.audience=?', (post_id, 'public' if public else 'draft')).fetchall()
         value.update(id=post_id, url='/news/' + post_id + '.html', media={asset['id']: media_json(asset) for asset in assets})
         if not public:
             published = json.loads(row['published']) if row['published'] else None
-            if published is not None: published.setdefault('displayMode', 'story')
-            value.update(revision=row['revision'], status='published' if published else 'draft', updated=row['updated'], hasChanges=bool(published and any(value.get(k) != published.get(k) for k in ('title','excerpt','category','branch','displayMode','coverId','blocks'))))
+            if published is not None:
+                published.setdefault('displayMode', 'story')
+                published.setdefault('eventDate', '')
+            value.update(revision=row['revision'], status='published' if published else 'draft', updated=row['updated'], publishedAt=published.get('publishedAt', '') if published else '', hasChanges=bool(published and any(value.get(k) != published.get(k) for k in ('title','excerpt','category','branch','displayMode','eventDate','coverId','blocks'))))
     return value
 
 def list_posts(public=False):
-    with db() as con: ids = [row[0] for row in con.execute('SELECT id FROM posts' + (' WHERE published IS NOT NULL' if public else '') + ' ORDER BY updated DESC LIMIT 500')]
-    return [get_post(post_id, public) for post_id in ids]
+    with db() as con: ids = [row[0] for row in con.execute('SELECT id FROM posts' + (' WHERE published IS NOT NULL' if public else ''))]
+    return chronological_posts([get_post(post_id, public) for post_id in ids])[:500]
 
 def process_video(media_id, incoming):
     output, poster = DATA / 'media' / (media_id + '.mp4'), DATA / 'media' / (media_id + '.jpg')
@@ -214,13 +233,14 @@ def public_snapshot():
     with db() as con:
         con.execute('BEGIN')
         result = []
-        for row in con.execute('SELECT id,published FROM posts WHERE published IS NOT NULL ORDER BY updated DESC'):
+        for row in con.execute('SELECT id,published FROM posts WHERE published IS NOT NULL'):
             post = json.loads(row['published'])
             post.setdefault('displayMode', 'story')
+            post.setdefault('eventDate', '')
             assets = con.execute("SELECT m.* FROM media m JOIN media_links l ON l.media_id=m.id WHERE l.post_id=? AND l.audience='public'", (row['id'],)).fetchall()
             post.update(id=row['id'], url='/news/'+row['id']+'.html', media={a['id']:media_json(a) for a in assets})
             result.append(post)
-        return result
+        return chronological_posts(result)
 
 
 def publishing_status():
@@ -265,7 +285,7 @@ def article_html(post, origin=None):
     cover_url=origin+(cover['poster'] or cover['url']) if cover else origin+'/assets/logo.png'
     schema=json.dumps({'@context':'https://schema.org','@type':'Article','headline':post['title'],'description':post['excerpt'],'datePublished':post['publishedAt'],'dateModified':post['updatedAt'],'image':cover_url,'author':{'@type':'Organization','name':'플리에 리듬체조 아카데미'},'mainEntityOfPage':canonical},ensure_ascii=True).replace('<',r'\u003c')
     template=(ROOT/'article.html').read_text(encoding='utf-8')
-    values={'TITLE':title,'DESCRIPTION':description,'CANONICAL':escape(canonical,quote=True),'COVER':escape(cover_url,quote=True),'CATEGORY':CATEGORIES[post['category']],'DATE':post['publishedAt'][:10].replace('-','.'),'BODY':''.join(blocks),'JSONLD':schema}
+    values={'TITLE':title,'DESCRIPTION':description,'CANONICAL':escape(canonical,quote=True),'COVER':escape(cover_url,quote=True),'CATEGORY':CATEGORIES[post['category']],'DATE':escape(post.get('eventDate', '').replace('-','.') or '행사 날짜 미입력'),'BODY':''.join(blocks),'JSONLD':schema}
     for key,value in values.items(): template=template.replace('{{'+key+'}}',value)
     return template
 
