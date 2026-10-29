@@ -3,7 +3,6 @@
   "albums": [
     {
       "key": "kyunghee-cup",
-      "eventDate": "2025-09-06",
       "id": "1e98e803d01fa54a07c0bfb1d9b056a7",
       "title": "플리에 경희대배",
       "excerpt": "경희대배에 참가한 아이들의 경기와 현장 기록입니다.",
@@ -409,7 +408,8 @@
           "thumbnailPath": "assets/events/kyunghee-cup/thumbs/kyunghee-cup-30.jpg",
           "size": 4067961
         }
-      }
+      },
+      "publishedAt": "2026-04-26T17:40:38+09:00"
     },
     {
       "key": "recital-2026",
@@ -610,7 +610,25 @@
           "thumbnailPath": "assets/events/recital-2026/thumbs/recital-2026-14.jpg",
           "size": 7830330
         }
-      }
+      },
+      "publishedAt": "2026-04-26T17:40:38+09:00"
     }
-  ]
+  ],
+  "publicationHistory": {
+    "1e98e803d01fa54a07c0bfb1d9b056a7": {
+      "publishedAt": "2026-04-26T17:40:38+09:00",
+      "sourcePath": "kyunghee-cup.html",
+      "commit": "45ae6f564b05e6548d0d33a8ff889fa745d34259"
+    },
+    "afa6bc71c9593fcb1fe474aacea4580f": {
+      "publishedAt": "2026-04-26T17:40:38+09:00",
+      "sourcePath": "recital-2026.html",
+      "commit": "45ae6f564b05e6548d0d33a8ff889fa745d34259"
+    },
+    "5606567045ae42ee918b830870326060": {
+      "publishedAt": "2026-10-29T10:56:16+09:00",
+      "sourcePath": "news/5606567045ae42ee918b830870326060.html",
+      "commit": "df501579d14ae1c11242f73e997e3beff6273923"
+    }
+  }
 }

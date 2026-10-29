@@ -156,3 +156,28 @@ window.addEventListener("keydown", (event) => {
     imageModal.querySelector("button[data-image-close]")?.focus();
   }
 });
+
+// Older galleries were published before their CMS import. Keep their original
+// Git publication date on the article as well as on the news listing.
+(async function showOriginalPublicationDate() {
+  const time = document.querySelector('.article-header time');
+  const canonical = document.querySelector('link[rel="canonical"]')?.getAttribute('href') || '';
+  const id = /\/news\/([a-f0-9]{32})\.html$/.exec(canonical)?.[1];
+  if (!time || !id) return;
+  let publishedAt;
+  try {
+    const response = await fetch('/content/legacy-albums.json', {cache:'no-cache'});
+    if (response.ok) publishedAt = (await response.json()).publicationHistory?.[id]?.publishedAt;
+  } catch {}
+  if (!publishedAt) {
+    try {
+      publishedAt = JSON.parse(document.querySelector('script[type="application/ld+json"]')?.textContent || '{}').datePublished;
+    } catch {}
+  }
+  const date = new Date(publishedAt);
+  if (!publishedAt || !Number.isFinite(date.getTime())) return;
+  const parts = new Intl.DateTimeFormat('en-CA', {timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(date);
+  const values = Object.fromEntries(parts.map(part => [part.type, part.value]));
+  time.textContent = `${values.year}.${values.month}.${values.day}`;
+  time.dateTime = date.toISOString();
+})();

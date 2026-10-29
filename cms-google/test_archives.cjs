@@ -50,7 +50,7 @@ lockAvailable=false;assert.equal(call('import-archives',{csrf:token}).ok,false);
 const kept=clone(state.posts);
 let result=call('import-archives',{csrf:token});assert.equal(result.ok,true,JSON.stringify(result));assert.deepEqual(result.value.imported,keys);assert.deepEqual(result.value.migratedArchives,keys);assert.equal(state.publication.phase,'building');
 assert.deepEqual(state.posts[priorId],kept[priorId]);assert.deepEqual(state.posts[draftId],kept[draftId]);assert.equal(Object.keys(state.posts).length,4);assert.equal(Object.keys(state.media).length,44);
-for(const album of catalog.albums){const row=state.posts[album.id];assert.equal(row.legacyKey,album.key);assert.equal(row.draft.displayMode,'gallery');assert.equal(row.draft.eventDate,album.eventDate||'');assert.equal(row.published.eventDate,album.eventDate||'');assert.equal(row.published.blocks.filter(b=>b.type==='image').length,album.key==='kyunghee-cup'?30:14);assert.equal(row.published.publishedAt,row.updated);}
+for(const album of catalog.albums){const row=state.posts[album.id];assert.equal(row.legacyKey,album.key);assert.equal(row.draft.displayMode,'gallery');assert.equal(row.published.blocks.filter(b=>b.type==='image').length,album.key==='kyunghee-cup'?30:14);assert.equal(row.published.publishedAt,row.updated);}
 assert.equal(requests.filter(r=>r.url==='/git/blobs'&&r.body.encoding==='base64').length,0,'Already public photos must not be duplicated');
 let feed=JSON.parse(requests.filter(r=>r.url==='/git/blobs').map(r=>r.body.content).find(s=>s.startsWith('{"posts":')));
 assert.equal(feed.posts.length,3);assert.deepEqual(feed.migratedArchives,keys);assert.equal(feed.posts.find(p=>p.id===priorId).title,'Already published');
@@ -68,7 +68,6 @@ for(const corrupt of [
  c=>c.albums[0].id='d'.repeat(32),
  c=>c.albums[0].key='unrecognized',
  c=>c.albums[0].blocks.pop(),
- c=>c.albums[0].eventDate='2026-02-30',
  c=>{const id=Object.keys(c.albums[1].media)[0];c.albums[1].media[id].sourcePath='https://evil.example/photo.jpg';},
  c=>{const id=Object.keys(c.albums[1].media)[0];c.albums[1].media[id].thumbnailPath='assets/events/recital-2026/../../private.jpg';},
  c=>{const id=Object.keys(c.albums[1].media)[0];c.albums[1].media[id].id='d'.repeat(32);}
@@ -81,9 +80,4 @@ const article={...clone(priorDraft),displayMode:'gallery',url:'/news/'+priorId+'
 const html=context.cmsArticle_(article);assert.equal((html.match(/class="article-gallery"/g)||[]).length,2);assert.equal((html.match(/data-image-open=/g)||[]).length,3);assert.ok(html.includes('src="/a-thumb.jpg"'));assert.ok(html.includes('&lt;script&gt;bad&lt;/script&gt;'));assert.ok(html.includes('&lt;unsafe &quot;label&quot;&gt;'));
 assert.ok(html.indexOf('Before')<html.indexOf('data-image-open="/a.jpg"'));assert.ok(html.indexOf('data-image-open="/b.jpg"')<html.indexOf('Between'));assert.ok(html.indexOf('Between')<html.indexOf('data-image-open="/c.jpg"'));assert.ok(html.indexOf('data-image-open="/c.jpg"')<html.indexOf('After'));
 assert.ok(!context.cmsArticle_({...article,displayMode:'story'}).includes('class="article-gallery"'));
-reset();remoteCatalog.albums[0].eventDate='2024-02-29';delete remoteCatalog.albums[1].eventDate;
-result=call('import-archives',{csrf:csrf()});assert.equal(result.ok,true);
-assert.equal(state.posts[first.id].draft.eventDate,'2024-02-29');assert.equal(state.posts[first.id].published.eventDate,'2024-02-29');
-assert.equal(state.posts[second.id].draft.eventDate,'');assert.equal(state.posts[second.id].published.eventDate,'');
-assert.notEqual(state.posts[first.id].published.publishedAt,'2024-02-29','Import time remains publication metadata, not the event date');
 console.log('PASS: real 44-photo catalog, owner/CSRF/lock gates, existing draft/published preservation, source reuse, default modes, gallery order/escaping, invalid input atomicity, idempotency and deletion/unpublish tombstones. No external writes.');

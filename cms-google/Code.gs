@@ -4,7 +4,7 @@ const CMS_SITE = 'https://www.plierg.com';
 const CMS_REPO = 'https://api.github.com/repos/plie-rg/Plie';
 const CMS_MAX_VIDEO = 25 * 1024 * 1024;
 const CMS_ARCHIVES = {
-  'kyunghee-cup': {id:'1e98e803d01fa54a07c0bfb1d9b056a7',count:30,category:'competition',eventDate:'2025-09-06'},
+  'kyunghee-cup': {id:'1e98e803d01fa54a07c0bfb1d9b056a7',count:30,category:'competition'},
   'recital-2026': {id:'afa6bc71c9593fcb1fe474aacea4580f',count:14,category:'event'}
 };
 
@@ -18,21 +18,6 @@ function cmsOwner_() {
 function cmsProps_() { return PropertiesService.getScriptProperties(); }
 function cmsId_(value) { if (typeof value !== 'string' || !/^[a-f0-9]{32}$/.test(value)) cmsFail_('항목을 찾을 수 없습니다.'); return value; }
 function cmsText_(value, max, required) { if (typeof value !== 'string' || value.length > max || required && !value.trim()) cmsFail_('입력 내용과 글자 수를 확인해 주세요.'); return value.trim(); }
-function cmsEventDate_(value) {
-  if (value === undefined || value === null || value === '') return '';
-  if (typeof value !== 'string' || !/^[1-9]\d{3}-\d{2}-\d{2}$/.test(value)) cmsFail_('행사 날짜를 YYYY-MM-DD 형식으로 입력해 주세요.');
-  const [year,month,day]=value.split('-').map(Number), leap=year%4===0&&(year%100!==0||year%400===0);
-  const days=[31,leap?29:28,31,30,31,30,31,31,30,31,30,31];
-  if(month<1||month>12||day<1||day>days[month-1]) cmsFail_('실제로 존재하는 행사 날짜를 입력해 주세요.');
-  return value;
-}
-function cmsPostOrder_(a,b,published) {
-  const left=published?a.published:a.draft, right=published?b.published:b.draft;
-  // Empty dates sort last. Updates must not move an existing event in the list.
-  return (right.eventDate||'').localeCompare(left.eventDate||'')
-    || ((b.published&&b.published.publishedAt)||'').localeCompare((a.published&&a.published.publishedAt)||'')
-    || a.id.localeCompare(b.id);
-}
 function cmsUuid_() { return Utilities.getUuid().replace(/-/g, ''); }
 function cmsEscape_(value) { return String(value || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function cmsPrivate_(file) {
@@ -46,19 +31,7 @@ function cmsFile_(id) {
   if (!parents.hasNext() || parents.next().getId() !== cmsFolder_().getId() || parents.hasNext()) cmsFail_('CMS 전용 파일이 아닙니다.');
   return file;
 }
-function cmsState_() {
-  const state=JSON.parse(cmsFile_(cmsProps_().getProperty('CMS_STATE_ID')).getBlob().getDataAsString('UTF-8'));
-  // Older imported albums predate the date field. Preserve every explicit choice,
-  // including a deliberately cleared date; this read does not write Drive data.
-  Object.keys(CMS_ARCHIVES).forEach(key=>{
-    const definition=CMS_ARCHIVES[key], row=state.posts&&state.posts[definition.id];
-    if(!definition.eventDate||!row||row.id!==definition.id||row.legacyKey!==key) return;
-    [row.draft,row.published].forEach(post=>{
-      if(post&&!Object.prototype.hasOwnProperty.call(post,'eventDate')) post.eventDate=definition.eventDate;
-    });
-  });
-  return state;
-}
+function cmsState_() { return JSON.parse(cmsFile_(cmsProps_().getProperty('CMS_STATE_ID')).getBlob().getDataAsString('UTF-8')); }
 function cmsWrite_(state) { cmsFile_(cmsProps_().getProperty('CMS_STATE_ID')).setContent(JSON.stringify(state)); }
 
 function setupPlieCms() {
@@ -103,7 +76,7 @@ function cmsRequest(action, payload) {
     if (action === 'logout') { cache.remove('cms-csrf'); return {ok:true,value:{ok:true}}; }
     if (!reads.includes(action)) { lock = LockService.getScriptLock(); if (!lock.tryLock(5000)) cmsFail_('다른 저장 작업이 진행 중입니다. 잠시 뒤 다시 시도해 주세요.'); }
     const state = cmsState_(); let value;
-    if (action === 'posts') value = {posts:Object.values(state.posts).sort((a,b)=>cmsPostOrder_(a,b,false)).map(p=>cmsPost_(state,p.id,false)),migratedArchives:cmsArchiveKeys_(state)};
+    if (action === 'posts') value = {posts:Object.values(state.posts).sort((a,b)=>b.updated.localeCompare(a.updated)).map(p=>cmsPost_(state,p.id,false)),migratedArchives:cmsArchiveKeys_(state)};
     if (action === 'post') value = cmsPost_(state,cmsId_(payload.id),true);
     if (action === 'media') value = cmsMedia_(state,cmsId_(payload.id),true);
     if (action === 'site-status') value = cmsStatus_(state);
@@ -144,7 +117,7 @@ function cmsYoutube_(value) {
 }
 function cmsValidate_(state,input,publish) {
   if (!input || !Array.isArray(input.blocks) || input.blocks.length > 100) cmsFail_('본문 형식을 확인해 주세요.');
-  const post = {title:cmsText_(input.title||'',100,publish),excerpt:cmsText_(input.excerpt||'',180),category:input.category||'class',branch:input.branch||'all',displayMode:input.displayMode||'story',eventDate:cmsEventDate_(input.eventDate),coverId:input.coverId||'',blocks:[]};
+  const post = {title:cmsText_(input.title||'',100,publish),excerpt:cmsText_(input.excerpt||'',180),category:input.category||'class',branch:input.branch||'all',displayMode:input.displayMode||'story',coverId:input.coverId||'',blocks:[]};
   if (!['notice','class','event','competition'].includes(post.category) || !['all','magok','gangnam'].includes(post.branch)) cmsFail_('분류와 지점을 확인해 주세요.');
   if (!['story','gallery'].includes(post.displayMode)) cmsFail_('이야기형 또는 사진첩형을 선택해 주세요.');
   const ids = [];
@@ -178,9 +151,8 @@ function cmsPost_(state,id,detail) {
   const row=state.posts[id]; if(!row) cmsFail_('게시물을 찾을 수 없습니다.');
   const value=JSON.parse(JSON.stringify(row.draft)), ids=detail ? value.blocks.filter(b=>b.mediaId).map(b=>b.mediaId) : [value.coverId];
   value.displayMode=value.displayMode||'story';
-  value.eventDate=value.eventDate||'';
   value.media={}; [...new Set(ids)].filter(Boolean).forEach(mid=>value.media[mid]=cmsMedia_(state,mid,detail));
-  return Object.assign(value,{id,revision:row.revision,updated:row.updated,publishedAt:row.published&&row.published.publishedAt||'',status:row.published?'published':'draft',hasChanges:!!row.published&&(['title','excerpt','category','branch','coverId','blocks'].some(k=>JSON.stringify(row.draft[k])!==JSON.stringify(row.published[k]))||(row.draft.displayMode||'story')!==(row.published.displayMode||'story')||(row.draft.eventDate||'')!==(row.published.eventDate||'')),url:'/news/'+id+'.html',legacyKey:row.legacyKey||''});
+  return Object.assign(value,{id,revision:row.revision,updated:row.updated,status:row.published?'published':'draft',hasChanges:!!row.published&&(['title','excerpt','category','branch','coverId','blocks'].some(k=>JSON.stringify(row.draft[k])!==JSON.stringify(row.published[k]))||(row.draft.displayMode||'story')!==(row.published.displayMode||'story')),url:'/news/'+id+'.html',legacyKey:row.legacyKey||''});
 }
 
 function cmsArchiveKeys_(state) {
@@ -303,7 +275,7 @@ function cmsSync_(state) {
   const prior=JSON.parse(read('content/cms-manifest.json')), instance=cmsProps_().getProperty('CMS_INSTANCE_ID');
   if(!Array.isArray(prior.files)||prior.files.some(p=>!cmsOwned_(p))) cmsFail_('게시 파일 목록이 올바르지 않습니다.');
   if(prior.ownerId!==instance && prior.files.some(p=>p.startsWith('news/')||p.startsWith('assets/journal/'))) cmsFail_('기존 관리자에 공개 게시물이 있습니다. 데이터를 이전한 뒤 연결해 주세요.');
-  const pending={}, summaries=[], sitemap=read('sitemap.xml').replace(/<url>\s*<loc>https:\/\/www\.plierg\.com\/news\/[a-f0-9]{32}\.html<\/loc>[\s\S]*?<\/url>/g,''), posts=Object.values(state.posts).filter(p=>p.published).sort((a,b)=>cmsPostOrder_(a,b,true));
+  const pending={}, summaries=[], sitemap=read('sitemap.xml').replace(/<url>\s*<loc>https:\/\/www\.plierg\.com\/news\/[a-f0-9]{32}\.html<\/loc>[\s\S]*?<\/url>/g,''), posts=Object.values(state.posts).filter(p=>p.published).sort((a,b)=>b.updated.localeCompare(a.updated));
   const mediaIds=[...new Set(posts.flatMap(p=>p.published.blocks.filter(b=>b.mediaId).map(b=>b.mediaId)))];
   const total=Object.values(files).filter(f=>!cmsOwned_(f.path)).reduce((n,f)=>n+(f.size||0),0)+mediaIds.reduce((n,id)=>n+(state.media[id].sourcePath?0:state.media[id].size+300000),0);
   if(total>800*1024*1024) cmsFail_('홈페이지 용량이 800MB를 넘습니다. 큰 영상은 유튜브 링크로 바꿔 주세요.');
@@ -320,7 +292,6 @@ function cmsSync_(state) {
   posts.forEach(row=>{
     const post=JSON.parse(JSON.stringify(row.published)); post.id=row.id;post.url='/news/'+row.id+'.html';post.media={};
     post.displayMode=post.displayMode||'story';
-    post.eventDate=post.eventDate||'';
     if(row.legacyKey) post.legacyKey=row.legacyKey;
     post.blocks.filter(b=>b.mediaId).forEach(b=>{const asset=state.media[b.mediaId];post.media[b.mediaId]={id:b.mediaId,kind:asset.kind,status:'ready',url:asset.sourcePath?'/'+asset.sourcePath:'/assets/journal/'+b.mediaId+(asset.kind==='video'?'.mp4':'.jpg'),thumbnail:asset.sourcePath?'/'+asset.thumbnailPath:'',poster:asset.kind==='video'?'/assets/journal/'+b.mediaId+'-poster.jpg':'',size:asset.size,error:''};});
     pending['news/'+row.id+'.html']=cmsBlob_(cmsArticle_(post),false);
@@ -358,7 +329,6 @@ function cmsArticle_(post) {
   const body=parts.join('');
   const canonical=CMS_SITE+post.url, image=CMS_SITE+(cover?(cover.poster||cover.url):'/assets/logo.png');
   const schema=JSON.stringify({'@context':'https://schema.org','@type':'Article',headline:post.title,description:post.excerpt,datePublished:post.publishedAt,dateModified:post.updatedAt,image,mainEntityOfPage:canonical,author:{'@type':'Organization',name:'플리에 리듬체조 아카데미'}}).replace(/</g,'\\u003c');
-  const eventDate=cmsEventDate_(post.eventDate);
-  const replacements={TITLE:e(post.title),DESCRIPTION:e(post.excerpt),CANONICAL:e(canonical),COVER:e(image),CATEGORY:categories[post.category],DATE:eventDate?eventDate.replace(/-/g,'.'):'행사 날짜 미입력',BODY:body,JSONLD:schema};
+  const replacements={TITLE:e(post.title),DESCRIPTION:e(post.excerpt),CANONICAL:e(canonical),COVER:e(image),CATEGORY:categories[post.category],DATE:post.publishedAt.slice(0,10).replace(/-/g,'.'),BODY:body,JSONLD:schema};
   return HtmlService.createHtmlOutputFromFile('Article').getContent().replace(/\{\{([A-Z]+)\}\}/g,(_,key)=>replacements[key]||'');
 }

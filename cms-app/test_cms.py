@@ -185,64 +185,6 @@ class CMSChecks(unittest.TestCase):
         self.assertNotIn('data-image-open=',story)
         self.assertIn('BETWEEN-PHOTOS',story)
 
-    def test_event_date_validation_and_legacy_default(self):
-        self.login(); payload=self.payload()
-        for invalid in ['2025-02-29','2024-02-30','1900-02-29','2026-04-31','2026-13-01','2026-00-10','2026-10-00','2026-1-01','0999-12-31','10000-01-01','2026-10-29T00:00:00Z',' 2026-10-29',None,20261029]:
-            with self.subTest(invalid=invalid):
-                payload['post']['eventDate']=invalid
-                self.assertEqual(self.request('/api/save',payload)[0],400)
-        for valid in ['1000-01-01','2000-02-29','2024-02-29','9999-12-31','']:
-            payload['post']['eventDate']=valid
-            status,_,post=self.request('/api/publish',payload)
-            self.assertEqual(status,200,post);self.assertEqual(post['eventDate'],valid)
-            payload['revision']=post['revision']
-        # Old records have no date field; reading them must not invent an edit.
-        with app.db() as con:
-            row=con.execute('SELECT draft,published FROM posts WHERE id=?',(post['id'],)).fetchone()
-            draft=json.loads(row['draft']); published=json.loads(row['published'])
-            draft.pop('eventDate');published.pop('eventDate')
-            con.execute('UPDATE posts SET draft=?,published=? WHERE id=?',(json.dumps(draft),json.dumps(published),post['id']))
-        legacy=self.request('/api/posts')[2]['posts'][0]
-        self.assertEqual(legacy['eventDate'],'');self.assertFalse(legacy['hasChanges'])
-        self.assertEqual(app.public_snapshot()[0]['eventDate'],'')
-        self.assertIn('행사 날짜 미입력',self.request(post['url'],anonymous=True)[2].decode())
-
-    def test_event_order_keeps_draft_edits_private_and_publication_dates_stable(self):
-        from unittest.mock import patch
-        self.login(); rows={}; payloads={}
-        for letter,event,publication in [('a','2024-01-01','2026-10-01T00:00:00Z'),('b','2025-01-01','2026-10-02T00:00:00Z'),('c','','2026-11-01T00:00:00Z'),('d','2024-01-01','2026-10-03T00:00:00Z')]:
-            payload=self.payload();payload['id']=letter*32;payload['post']['eventDate']=event
-            with patch.object(app,'NOW',return_value=publication):
-                status,_,rows[letter]=self.request('/api/publish',payload)
-            self.assertEqual(status,200,rows[letter]);payloads[letter]=payload
-        def public_ids(): return [post['id'][0] for post in self.request('/api/public/posts',anonymous=True)[2]['posts']]
-        self.assertEqual(public_ids(),['b','d','a','c'])
-        payload=payloads['a'];payload['revision']=rows['a']['revision'];payload['post']['eventDate']='2030-01-01'
-        with patch.object(app,'NOW',return_value='2031-01-01T00:00:00Z'):
-            status,_,saved=self.request('/api/save',payload)
-        self.assertEqual(status,200,saved);self.assertTrue(saved['hasChanges'])
-        self.assertEqual(self.request('/api/posts')[2]['posts'][0]['id'],'a'*32)
-        self.assertEqual(public_ids(),['b','d','a','c'])
-        self.assertEqual([p['id'][0] for p in app.public_snapshot()],['b','d','a','c'])
-        html=self.request(saved['url'],anonymous=True)[2].decode()
-        self.assertIn('2024.01.01',html);self.assertNotIn('2030.01.01',html)
-        payload['revision']=saved['revision']
-        status,_,published=self.request('/api/publish',payload)
-        self.assertEqual(status,200,published);self.assertFalse(published['hasChanges'])
-        self.assertEqual(public_ids(),['a','b','d','c'])
-        snapshot=app.get_post(published['id'],public=True)
-        self.assertEqual(snapshot['publishedAt'],'2026-10-01T00:00:00Z')
-        html=self.request(published['url'],anonymous=True)[2].decode()
-        self.assertIn('2030.01.01',html)
-        self.assertIn('"datePublished": "2026-10-01T00:00:00Z"',html)
-        payload['revision']=published['revision'];payload['post']['eventDate']=''
-        self.assertEqual(self.request('/api/publish',payload)[0],200)
-        self.assertEqual(public_ids(),['b','d','c','a'])
-
-    def test_equal_event_and_publication_dates_use_id_tie_break(self):
-        posts=[{'id':'b','eventDate':'2026-10-01','publishedAt':'2026-10-29T00:00:00Z'}, {'id':'a','eventDate':'2026-10-01','publishedAt':'2026-10-29T00:00:00Z'}, {'id':'c','eventDate':'','publishedAt':'2099-01-01T00:00:00Z'}]
-        self.assertEqual([p['id'] for p in app.chronological_posts(posts)],['a','b','c'])
-
     def test_news_index_and_legacy_public_routes_are_explicit(self):
         from unittest.mock import patch
         root=Path(self.temp.name)/'site';(root/'news').mkdir(parents=True);(root/'content').mkdir()

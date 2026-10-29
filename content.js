@@ -4,25 +4,32 @@
   const categories = {notice:'공지사항',class:'수업 이야기',event:'행사 · 발표회',competition:'대회 소식'};
   const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const safeUrl = value => typeof value === 'string' && /^\/(?!\/)[A-Za-z0-9_./-]+$/.test(value) ? value : '';
-  function eventDate(value) {
-    if (typeof value !== 'string') return '';
-    const match = /^([1-9]\d{3})-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/.exec(value);
-    if (!match) return '';
+  const koreanDate = new Intl.DateTimeFormat('en-CA', {timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit'});
+  function publicationTime(value) {
+    if (typeof value !== 'string') return Number.NEGATIVE_INFINITY;
+    const match = /^(\d{4})-(\d{2})-(\d{2})T(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d{1,3})?(?:Z|[+-](?:[01]\d|2[0-3]):[0-5]\d)$/.exec(value);
+    if (!match) return Number.NEGATIVE_INFINITY;
     const year = Number(match[1]), month = Number(match[2]), day = Number(match[3]);
     const days = [31,year%4===0&&(year%100!==0||year%400===0)?29:28,31,30,31,30,31,31,30,31,30,31];
-    return day <= days[month-1] ? value : '';
+    if (month < 1 || month > 12 || day < 1 || day > days[month-1]) return Number.NEGATIVE_INFINITY;
+    const time = Date.parse(value);
+    return Number.isFinite(time) ? time : Number.NEGATIVE_INFINITY;
   }
-  function datedPost(post, catalog) {
-    // Only restore a verified archive date when an older CMS omitted the field.
-    // An explicit empty date is the operator's choice and must stay empty.
-    const archive = (catalog.albums || []).find(a => a.key === post.legacyKey && a.id === post.id);
-    const date = Object.hasOwn(post, 'eventDate') ? post.eventDate : archive?.eventDate;
-    return {...post, eventDate:eventDate(date)};
+  function originalPublication(post, catalog) {
+    const history = catalog.publicationHistory;
+    const recorded = history && Object.prototype.hasOwnProperty.call(history, post.id) ? history[post.id]?.publishedAt : '';
+    if (Number.isFinite(publicationTime(recorded))) return recorded;
+    return Number.isFinite(publicationTime(post.publishedAt)) ? post.publishedAt : '';
   }
-  function chronological(a, b) {
-    return b.eventDate.localeCompare(a.eventDate)
-      || String(b.publishedAt || '').localeCompare(String(a.publishedAt || ''))
-      || String(a.id || '').localeCompare(String(b.id || ''));
+  function calendarDate(value) {
+    const time = publicationTime(value);
+    if (!Number.isFinite(time)) return '';
+    const parts = Object.fromEntries(koreanDate.formatToParts(new Date(time)).map(part => [part.type,part.value]));
+    return `${parts.year}-${parts.month}-${parts.day}`;
+  }
+  function newestPublication(a, b) {
+    const aTime = publicationTime(a.publishedAt), bTime = publicationTime(b.publishedAt);
+    return (aTime === bTime ? 0 : aTime < bTime ? 1 : -1) || String(a.id || '').localeCompare(String(b.id || ''));
   }
   async function json(url) {
     const response = await fetch(url, {cache:'no-cache'});
@@ -44,8 +51,8 @@
     const url = safeUrl(post.url);
     if (!url) return '';
     const gallery = post.displayMode === 'gallery';
-    const date = post.eventDate;
-    return `<article class="journal-card"><a href="${esc(url)}" class="journal-photo" aria-label="${esc(post.title)}">${image ? `<img src="${esc(image)}" alt="${esc(post.title)}" loading="lazy" decoding="async">` : '<span>plié.</span>'}${gallery ? '<span class="journal-kind">사진첩</span>' : ''}</a><div class="journal-copy"><div class="journal-meta"><span>${categories[post.category] || '플리에 소식'}</span>${date ? `<time datetime="${esc(date)}">${esc(date.replaceAll('-','.'))}</time>` : '<span>행사 날짜 미입력</span>'}</div><h2><a href="${esc(url)}">${esc(post.title)}</a></h2><p>${esc(post.excerpt)}</p><a class="journal-read" href="${esc(url)}">${gallery ? '사진첩 보기' : '이야기 읽기'} ↗</a></div></article>`;
+    const date = calendarDate(post.publishedAt);
+    return `<article class="journal-card"><a href="${esc(url)}" class="journal-photo" aria-label="${esc(post.title)}">${image ? `<img src="${esc(image)}" alt="${esc(post.title)}" loading="lazy" decoding="async">` : '<span>plié.</span>'}${gallery ? '<span class="journal-kind">사진첩</span>' : ''}</a><div class="journal-copy"><div class="journal-meta"><span>${categories[post.category] || '플리에 소식'}</span>${date ? `<time datetime="${esc(date)}" title="최초 게시일">${esc(date.replaceAll('-','.'))}</time>` : '<span>행사 기록</span>'}</div><h2><a href="${esc(url)}">${esc(post.title)}</a></h2><p>${esc(post.excerpt)}</p><a class="journal-read" href="${esc(url)}">${gallery ? '사진첩 보기' : '이야기 읽기'} ↗</a></div></article>`;
   }
   async function start() {
     try {
@@ -55,7 +62,8 @@
       ]);
       if (!Array.isArray(feed.posts)) throw new Error('Invalid feed');
       const posts = [...feed.posts, ...legacyPosts(catalog, feed)]
-        .map(post => datedPost(post, catalog)).sort(chronological);
+        .map(post => ({...post,publishedAt:originalPublication(post,catalog)}))
+        .sort(newestPublication);
       document.querySelectorAll('[data-cms-section]').forEach(section => {
         const home = section.dataset.cmsSection === 'home';
         if (home && !posts.length) return;

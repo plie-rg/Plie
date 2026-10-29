@@ -32,8 +32,7 @@ for source, replacement in [
 ]:
     assert backend.count(source)==1, source
     backend=backend.replace(source,replacement)
-bundle=('// Paste this entire file into Code.gs in the Plie content CMS project.\n'
-        '// For updates, keep the existing project and deployment; existing data and properties are retained.\n'
+bundle=('// Paste this entire file into Code.gs in the NEW Plie content CMS project.\n'
         '// Do not paste into the rental project. No additional HTML files are required.\n'
         +backend+'\nconst CMS_ADMIN_HTML = '+json.dumps(html,ensure_ascii=True)+';\n'
         +'const CMS_ARTICLE_HTML = '+json.dumps(article,ensure_ascii=True)+';\n')

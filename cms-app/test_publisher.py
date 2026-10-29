@@ -135,26 +135,6 @@ class PublishingChecks(unittest.TestCase):
             with self.assertRaisesRegex(publisher.PublishError,'80MB'): self.pub.push_snapshot()
         self.assertEqual(self.remote_file('content/cms-manifest.json'),before)
 
-    def test_event_date_export_order_is_unchanged_by_a_private_draft(self):
-        rows={}
-        for letter,event in [('a','2024-02-29'),('b','2026-09-01'),('c','')]:
-            value=dict(self.post(),eventDate=event)
-            with patch.object(app,'NOW',return_value='2026-10-29T00:00:00Z'):
-                rows[letter]=app.change_post(letter*32,{'post':value},'publish')
-        first=self.pub.push_snapshot()
-        feed=json.loads(self.remote_file('content/posts.json'))['posts']
-        self.assertEqual([p['id'][0] for p in feed],['b','a','c'])
-        self.assertEqual([p['eventDate'] for p in feed],['2026-09-01','2024-02-29',''])
-        article=self.remote_file('news/'+'a'*32+'.html').decode()
-        self.assertIn('2024.02.29',article)
-        self.assertIn('"datePublished": "2026-10-29T00:00:00Z"',article)
-        self.assertIn('행사 날짜 미입력',self.remote_file('news/'+'c'*32+'.html').decode())
-        value=dict(self.post(title='PRIVATE DATE EDIT'),eventDate='2030-01-01')
-        with patch.object(app,'NOW',return_value='2031-01-01T00:00:00Z'):
-            app.change_post('a'*32,{'revision':rows['a']['revision'],'post':value},'save')
-        self.assertEqual(self.pub.push_snapshot(),first)
-        self.assertEqual(json.loads(self.remote_file('content/posts.json'))['posts'],feed)
-
     def test_worker_only_reports_live_after_matching_http_release(self):
         self.pub.pending=True
         with patch.object(self.pub,'check_live',return_value=True): self.pub.run()
