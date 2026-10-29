@@ -1,8 +1,9 @@
 플리에 Google 게시물 관리자
 
 관리 계정: plie0312@gmail.com
-관리 주소: https://script.google.com/macros/s/AKfycbzDBC65fprV2WZGbjnK0tNhGC5T449x3OlQZN-lTFz4KrwbFsY83ynOfmjCB3oMxHYl/exec
-접속 방법: 이 주소를 관리자의 브라우저 즐겨찾기에 저장합니다. 공개 홈페이지에는 관리자 링크를 표시하지 않습니다.
+관리 접속 주소: https://www.plierg.com/admin/
+실제 Google 관리자 주소: https://script.google.com/macros/s/AKfycbzDBC65fprV2WZGbjnK0tNhGC5T449x3OlQZN-lTFz4KrwbFsY83ynOfmjCB3oMxHYl/exec
+접속 방법: /admin/을 즐겨찾기에 저장합니다. Google 관리자 주소로 이동하며 Google 계정 권한 확인은 그대로 유지합니다. 공개 홈페이지 메뉴에는 관리자 링크를 표시하지 않습니다.
 
 현재 상태
 - 사용자가 새 프로젝트 생성, setupPlieCms 권한 승인, 웹 앱 배포를 진행하고 위 주소를 제공했습니다.
